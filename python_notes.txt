@@ -5,6 +5,16 @@ Functions
 * no return type - either what return statement returns or None. (not last statement stuff)
 * args have  no type either.
 * function are objects too.. 
+* invoked with fnName(args) [dont forget parenthesis for empty-arg fns]
+
+eg:
+
+def add(a,b):
+  c=a+b
+  return c
+
+add(5,10)
+  
 
 
 Commenting comments
@@ -140,7 +150,7 @@ control structures
 
 if condition:
   ...
-elif next_condition:
+elif next_condition:         #python's else if style
   ..
 else
   ..
@@ -150,6 +160,9 @@ with lists.
   range(start-value, end-value+1, increment)
 
 for i in list:
+  ..use i..
+
+for i in range(1,10):
   ..use i..
 
 break
