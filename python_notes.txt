@@ -168,6 +168,19 @@ for i in range(1,10):
 break
 continue
 
+class
+-----
+
+class Name:
+  #There is no explicity declaring of members
+
+  def __init__(self,arg1,arg2):
+    self.member1=arg1           #automaticaly adds member1 as a field to the class objects.
+
+  def function(self,arg1):
+    pass                        #all member function's first arg is self.
+    Name.count++;               #refering a Name.member brings in a c++-style static member of the class.
+
 
 Simple commands
 ----------------
