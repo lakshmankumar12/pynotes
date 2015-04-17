@@ -24,10 +24,6 @@ Commenting comments
 * function.__doc__ is the way to get the doc-string of a function
 * Simple comments begin with #
 
-Exceptions
-
-* No one defines what exceptions will be raised. We handle every possible exception
-
 Data-types
 ===========
 
@@ -182,6 +178,9 @@ class Name:
     Name.count++;               #refering a Name.member brings in a c++-style static member of the class.
 
 
+#Later..
+n = Name(10,12)
+
 Simple commands
 ----------------
 
@@ -197,7 +196,7 @@ older pythong:
 print "format string %d, %s, %s"%(int_var,str_var,"string literal")
 
 
-Error handling
+Error handling/Exception
 --------------
 
 try:
@@ -205,6 +204,15 @@ try:
 except IOError:
 
 # Note its except and not expect
+
+* No one defines what exceptions will be raised. We handle every possible exception
+
+def function():
+  ...;
+  if problem:
+    raise IOError;
+  ...;
+
 
 
 Reading file line by line:
@@ -258,3 +266,10 @@ Find python version
 -------------------
 
 python -v
+
+
+Python Internals
+---------------
+
+Every name you see is a reference/pointer to an object.
+The underlying object is either an immutable object or a mutable object.
