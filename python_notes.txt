@@ -164,6 +164,15 @@ for i in range(1,10):
 break
 continue
 
+logical operators
+-----------------
+
+and
+or
+not
+
+
+
 class
 -----
 
@@ -184,7 +193,11 @@ n = Name(10,12)
 Simple commands
 ----------------
 
-print()
+print()   # also prints a "\n" at end of string
+
+print "happy arg:%d"%arg,  # the trailing comman skips the newline
+
+print('.',end="",flush=True)   # to control "\n" and flushing  .. only in python 3
 
 string.format(args)
 '{0} {1:2d}'.format(s,i)
@@ -220,7 +233,7 @@ Reading file line by line:
 
 
 with open("file","r") as fp:
-  for i in fp
+  for i in fp:
     print(i)
 
 f.readline()
