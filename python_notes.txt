@@ -52,13 +52,18 @@ len(a)
 a.append(one_value)
 a.extend([list])
 a.insert(index,value)
-del a[index]
+del a[index]   # list size reduced by one. and all indices index+1:<end> .. become index:<end>
 a.pop()  # pops the last index, gets a IndexError when we pop a empty list. List reduces after pop.
 a.pop(index)  # pops given index
 a.remove(value)  # pops vlaue. raises ValueError if value is not found
 a.index(value)  # gives index of the value.
+sorted(a)   # Gives a new list which is sorted a.
+str.join(a)  # joins each element in a with str as the joining character .. eg: '\n'.join(a)
 
-value in a # boolean expression to check if value is in a list.
+value in a # boolean expression to check if value is in a list. WORKS FOR STRING AS WELL
+
+for value in a:
+  # .. use value
 
 + operator concaetanates lists
 
@@ -98,7 +103,9 @@ Dictionary
 
 a[key] = value  # for assignment or referenence. Note they key is indexed using squre braket only!
 
-list(a.keys())  # creates a list of keys of dictionary a
+a.keys()    # gives a list of keys of dictionary a, not necesarily in sorted order .. probably iterable in py-3
+a.vaues()   # gives a list of values
+a.items()   # gives a list of tuple of (key, value) from a dictionary
 
 orig_dict.update(another_dict)
 
@@ -115,7 +122,7 @@ strings
 ---------
 
 * Every string is a UTF-8 encoded sequence of characters.
-* strings can be single or double-quoted. Triple single quotes is for long strings
+* strings can be single or double-quoted. Triple single quotes is for long strings. r'raw \.string' is a raw strings
 * + is a way to concatenate strings
 
 a.splitlines()       # list of lines. The restult wont have carriage returns.
@@ -240,10 +247,11 @@ Reading file line by line:
 
 
 with open("file","r") as fp:
-  for i in fp:
+  for i in fp                   <- This is efficient on large files.
     print(i)
 
-f.readline()
+f.readlines()   # gives each line of file in a list.. Note: Entire file is gobbled in one-go. Useful only for small files.
+f.read()        # gets entire file as one big string. Again, use for small files only.
 
 Reading line by line from stdin:
 
@@ -281,6 +289,36 @@ exiting from python
 ---------------------
 
 sys.exit(0)
+
+regular expression
+------------------
+
+import re
+m =  re.search (pat, haystack)   # m is a match object or a None
+
+m.group()  # gets the matched string
+m.group(1)  # gets the 1st left paren group.
+
+a = re.findall (pat, haystack)  # gets the list of all matches.. if he pat has (), then it gets back a list of tuples
+
+os-package
+----------
+
+os.path.join(dir,filename)
+os.path.abspath(path)
+os.path.exists('path/to/file')
+
+import commands
+
+urllib
+------
+
+import urllib
+
+uf = urllib.urlopen('http://google.com')
+file_page = uf.read()
+
+urllib.urlretrive('http://google.com/intl/en_ALL/images/logo.gif', 'blah.gif')
 
 Find python version
 -------------------
