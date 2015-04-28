@@ -4,7 +4,7 @@ Functions
 * start with def
 * no return type - either what return statement returns or None. (not last statement stuff)
 * args have  no type either.
-* function are objects too.. 
+* function are objects too..
 * invoked with fnName(args) [dont forget parenthesis for empty-arg fns]
 
 eg:
@@ -14,7 +14,6 @@ def add(a,b):
   return c
 
 add(5,10)
-  
 
 
 Commenting comments
@@ -44,11 +43,11 @@ List
 * list is [ .. ] separated by comma
 * list elements are indexed from 0 and name[0] is the way to get one element
 * -1 is the last element.
-* slicing is first index to *one before* the second index. 
+* slicing is first index to *one before* the second index.
 * Slicing creates a copy, so a[:] is a shorthand for getting a copy of a list
 * lists never have gaps
 
-len(a) 
+len(a)
 a.append(one_value)
 a.extend([list])
 a.insert(index,value)
@@ -71,8 +70,8 @@ Tuples
 -----
 
 * Use ( , .. , ) for types instead of squarebracket.
-* (tuple1) = (tuple2) 
-    eg: (x,y,z) = (1,2,3) is a conveneient way to assign multiple variables respectively 
+* (tuple1) = (tuple2)
+    eg: (x,y,z) = (1,2,3) is a conveneient way to assign multiple variables respectively
 
 
 Sets
@@ -80,7 +79,7 @@ Sets
 
 * Use { , .. , } for sets
 * sets dont remember order of their elements
-* values in the sets are unique. 
+* values in the sets are unique.
 
 a.add(value)  # adds a value to set if its not already present.
 a.update(value, set, list) # addes the value, members of set, list to the set.
@@ -144,7 +143,7 @@ a.lstrip()
 bytes
 -----
 
-defined as b'\xfe' or b'abc' 
+defined as b'\xfe' or b'abc'
 
 a.decode('ascii')    # gives a string object
 
@@ -247,7 +246,7 @@ Reading file line by line:
 
 
 with open("file","r") as fp:
-  for i in fp                   <- This is efficient on large files.
+  for i in fp:                  # This is efficient on large files.
     print(i)
 
 f.readlines()   # gives each line of file in a list.. Note: Entire file is gobbled in one-go. Useful only for small files.
@@ -255,7 +254,7 @@ f.read()        # gets entire file as one big string. Again, use for small files
 
 Reading line by line from stdin:
 
-import fileinput      
+import fileinput
 for line in fileinput.input():   #this one will pick stdin or if some arg(s) is/are given, it will open that as a file!
   pass
 
