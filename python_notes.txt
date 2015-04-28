@@ -227,6 +227,13 @@ def function():
   ...;
 
 
+Various ways to catch exceptions:
+
+except IOError as e:
+  e.whatever..
+
+
+
 
 Reading file line by line:
 --------------------------
