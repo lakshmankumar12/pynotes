@@ -267,13 +267,20 @@ Arg parse
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("-v","--verbose", help="increase output verbosity",
-                    action="store_true", choices=[0, 1, 2])             # or action="count
-parser.add_argument("square", help="display a square of a given number (this is a positional argment)",
-                     type=int)
+parser.add_argument("-v","--verbose", help="increase output verbosity", action="store_true")       # captures if --verbosity present or not in arg-list. No arg per-se for this option.
+parser.add_argument("-v","--verbose", help="increase output verbosity", action="count")            # captures how many times --verbosity was present in arg-list. No arg per-se for this option.
+parser.add_argument("-v","--verbose", help="increase output verbosity", type=int)                  # --verbosity <int>
+parser.add_argument("-v","--verbose", help="increase output verbosity", type=int, choices=[0,1,2]) # --verbosity <0|1|2>
+parser.add_argument("square", help="display a square of a given number (this is a positional argment)", type=int)
+
 args = parser.parse_args()
 if args.verbose:
       print("verbosity turned on")
+
+also:
+group = parser.add_mutually_exclusive_group()
+group.add_argument("-v", "--verbose", action="store_true")
+group.add_argument("-q", "--quiet", action="store_true")
 
 argc/argv example
 -----------------
@@ -300,14 +307,22 @@ m.group(1)  # gets the 1st left paren group.
 
 a = re.findall (pat, haystack)  # gets the list of all matches.. if he pat has (), then it gets back a list of tuples
 
-os-package
+os-package (file manipulation stuff)
 ----------
 
 os.path.join(dir,filename)
 os.path.abspath(path)
 os.path.exists('path/to/file')
+os.path.isdir('path/to/dir')
+os.makedirs(path)   # no mkdir -p option.. just check isdir and then do this or do , catch except (latter better)
 
 import commands
+
+Run a sub-command (deprecated os.system())
+
+import subprocess
+
+subprocess.call(["ls","-l"])
 
 urllib
 ------
