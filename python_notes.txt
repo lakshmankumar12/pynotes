@@ -29,7 +29,7 @@ Data-types
 booleans
 numbers
 strings
-bytes and byte-arrays
+bytes and bytearray
 lists
 tuples
 sets
@@ -116,6 +116,8 @@ List comprehesion
 
 so is it with dictionary and set comprehesion
 
+{ expression_with_i:another_expression_with_i for i in a_list if condition }
+
 
 strings
 ---------
@@ -145,7 +147,12 @@ bytes
 
 defined as b'\xfe' or b'abc'
 
-a.decode('ascii')    # gives a string object
+a=b'\x65\x48'        # a bytes object
+a.decode('ascii')    # gives a string object. 
+                     # encode/decode complement bytes/str conversion
+
+bytes like string is immutable
+bytearray is mutuable
 
 control structures
 ------------------
@@ -170,6 +177,23 @@ for i in range(1,10):
 break
 continue
 
+Want to iterate over 2(or more) lists of the same length simulataneously?
+ -> Keep them as one list of tuples!
+eg:
+student=['s1','s2','s3']
+mentor=['m1',m2','m3]
+count = 0
+for s in student:
+  print s,m[0]
+
+can instead be:
+
+student_mentors=[('s1','m1'),('s2','m2'),('s3','m3')]
+for (s,m) in student_mentors:
+  print s,m
+
+
+
 logical operators
 -----------------
 
@@ -185,6 +209,8 @@ class
 class Name:
   #There is no explicity declaring of members
 
+  count = 0                     # Can be used like static in c++, but see notes below
+
   def __init__(self,arg1,arg2):
     self.member1=arg1           #automaticaly adds member1 as a field to the class objects.
 
@@ -195,6 +221,63 @@ class Name:
 
 #Later..
 n = Name(10,12)
+
+* The attributes of a class are kind of public. No data-encapsulation.
+* In fact, attributes of a class can be added at will anytime. There is really no
+  fixed-set of attributes for a class
+  n.newAttribute = "abc"   # is perfectly valid anywhere!
+* ClassName.var_name  # when used with ClassName refers to a var_name in class-scope(static like)
+* methods in the class can work on static members as long as they use ClassName to scope it.
+* But instance_var.var_name  # when assigned to, will create a instance level attribute!
+
+
+
+Magic attributes of a class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+n.__class__    # reference to a object of type class, which represents the class-definition
+n.__doc__      # reference to the doc-string
+
+Iterators
+---------
+
+Generator
+---------
+
+* Is a function (defined with def Name():)
+* But has a yield statement in it.
+* You have to first create a object by calling generate_name() [read, generate_name param param]
+* Later you call gentr.next() to start getting values out of it.
+* When its done, you get StopIteration thrown (This happens when generator code falls off its def block)
+* On actual invocation (creation of object), no code gets executed.
+* On first next, code gets executed till yield which is returned outside
+* On susequent next()'s, code continues from yield till yield is hit again. Note taht all vars in
+  the def block remember their values
+* WHen code falls off the def-block, we get StopIteration thrown to the next() caller.
+
+
+
+closures
+----------
+
+* A (typically anonymous) function that takes arguments (like normal function) and has a state inside it.
+* The state is set up in the closure at the time of its creation.
+* The closure can mutate its state during every invocation
+* Multiple instances of the same closure function can have different states.
+
+A closure is typically created like this
+
+def create_a_closure(state1_for_closure):
+  state2_for_closure = "some_initial_value"
+  def my_closure(closure_arg1, closure_arg2):
+    result = work_on(state1_for_closure, state2_for_closure, closure_arg1, closure_arg2)
+    state1_for_closure = "new_values"  # Note this state was setup at closure create time (call of create_a_closure)
+    state2_for_closure = "new_values"  # Note this state was setup at coding time
+    return result
+  return my_closure
+
+#Later
+a_closure = create_a_closure("intial_value_for_state1")
 
 Simple commands
 ----------------
@@ -311,18 +394,28 @@ os-package (file manipulation stuff)
 ----------
 
 os.path.join(dir,filename)
+(dirname,filename) = os.path.split("abc/efg/file")
+(filename,extension) = os.path.splitext("filename.ext")  # note the spelling split-ext
 os.path.abspath(path)
+os.path.realpath(path)  # resolves sym-links!
 os.path.exists('path/to/file')
 os.path.isdir('path/to/dir')
 os.makedirs(path)   # no mkdir -p option.. just check isdir and then do this or do , catch except (latter better)
 
-import commands
-
-Run a sub-command (deprecated os.system())
-
 import subprocess
-
 subprocess.call(["ls","-l"])
+
+import glob
+list_of_filenames=glob.glob("*.py")
+
+time
+----
+
+>>> import time
+>>> st_mtime=1247520344.9537716
+>>> time.localtime(st_mtime)
+time.struct_time(tm_year=2009, tm_mon=7, tm_mday=13, tm_hour=14, tm_min=25, tm_sec=44, tm_wday=0, tm_yday=194, tm_isdst=1)
+>>>
 
 urllib
 ------
