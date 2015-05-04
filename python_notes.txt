@@ -135,7 +135,7 @@ a.split(delimiter,times)   # splits a string based on delimiter. THe second is o
 a.encode('utf-8')    # gives a bytes object
 
 a.index()
-a.find()
+haystack.find(needle [,start [,end]])  # give index in haystack where needle is found, -1 on failure, start:end as in slicing
 a.replace()
 
 a.strip()            # trim whitespaces
@@ -241,6 +241,11 @@ n.__doc__      # reference to the doc-string
 Iterators
 ---------
 
+* A class that implements __iter__ , which returns a object that implements __next__
+* Typically its customary to return self in __iter__ and implemen __next__
+* User calls next() and gets StopIteration error at end.
+
+
 Generator
 ---------
 
@@ -253,9 +258,15 @@ Generator
 * On first next, code gets executed till yield which is returned outside
 * On susequent next()'s, code continues from yield till yield is hit again. Note taht all vars in
   the def block remember their values
-* WHen code falls off the def-block, we get StopIteration thrown to the next() caller.
+* When code falls off the def-block, we get StopIteration thrown to the next() caller.
 
+Generator expressions
+---------------------
 
+* syntactically different form Comprehension with a parenthesis!
+* Generators are cheaper than comprehension as the list isn't created right away
+
+(expression for i in origList)
 
 closures
 ----------
@@ -278,6 +289,17 @@ def create_a_closure(state1_for_closure):
 
 #Later
 a_closure = create_a_closure("intial_value_for_state1")
+
+itertools
+----------
+
+itertools.permutations(iterable, size_to_work)
+itertools.combinations(iterable, size_to_work)
+itertools.product(iterable, iterable)           -> (1,a), (1,b), (1,c), (2,a), (2,b), (2,c)
+itertools.groupby(iterable,keyfunc)             -> listof (keyvalue, sub-iterators) Note: given iterable Must be already sorted/sub-sorted.
+itertools.chain(it1,it2,..itn)                  -> single iterator that goes over all
+itertools.zip(it1,it2,..itn)                    -> single iterator that goes over tuples of members of all iterables. Stops at shorted.
+itertools.zip_longest(it1,it2,..itn)            -> ..zip till longes, filling None for thse that are over.
 
 Simple commands
 ----------------
@@ -403,7 +425,9 @@ os.path.isdir('path/to/dir')
 os.makedirs(path)   # no mkdir -p option.. just check isdir and then do this or do , catch except (latter better)
 
 import subprocess
-subprocess.call(["ls","-l"])
+subprocess.call(["ls","-l"])   # Just run it clobbering ur stdout with the cmd's stdout.
+subprocess.getoutput("ls -1")  # Run and get the o/p as return value
+
 
 import glob
 list_of_filenames=glob.glob("*.py")
