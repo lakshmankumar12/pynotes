@@ -367,6 +367,23 @@ import sys
 for line in sys.stdin:
   print line
 
+User input
+----------
+
+variable=input("Prompt string w/o newline:")     # Gets user-input and interprets it as a python-expression! Thus unquoted string-literals are interpreted as var-names
+                                                 # Most likely not what you want. But if you type in a int, your variable also holds a int-object directly.
+variable=raw_input("Prompt string w/o newline:") # Gets whatever is given and assigns to variable which is now a str. You then cast this string into whatever you want.
+
+Use readline library
+~~~~~~~~~~~~~~~~~~~~
+import readline
+def rlinput(prompt, prefill=''):
+  readline.set_startup_hook(lambda: readline.insert_text(prefill))
+  try:
+    return raw_input(prompt)
+  finally:
+    readline.set_startup_hook()
+
 Arg parse
 --------
 
@@ -376,7 +393,9 @@ parser.add_argument("-v","--verbose", help="increase output verbosity", action="
 parser.add_argument("-v","--verbose", help="increase output verbosity", action="count")            # captures how many times --verbosity was present in arg-list. No arg per-se for this option.
 parser.add_argument("-v","--verbose", help="increase output verbosity", type=int)                  # --verbosity <int>
 parser.add_argument("-v","--verbose", help="increase output verbosity", type=int, choices=[0,1,2]) # --verbosity <0|1|2>
-parser.add_argument("square", help="display a square of a given number (this is a positional argment)", type=int)
+parser.add_argument("square",   help="display a square of a given number (this is a mandatory argment)", type=int)
+parser.add_argument("optional", help="User may skip this", nargs="?", default="abc")
+parser.add_argument("many_optional", help="User may give zero or  more of this and this will be a list", nargs="*", default=["a","b"])
 
 args = parser.parse_args()
 if args.verbose:
@@ -411,6 +430,8 @@ m.group()  # gets the matched string
 m.group(1)  # gets the 1st left paren group.
 
 a = re.findall (pat, haystack)  # gets the list of all matches.. if he pat has (), then it gets back a list of tuples
+
+a = re.sub(pat,replacement,count=0,flags=0)  # replace can use \1 to backref.
 
 os-package (file manipulation stuff)
 ----------
