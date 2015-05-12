@@ -123,7 +123,7 @@ strings
 ---------
 
 * Every string is a UTF-8 encoded sequence of characters.
-* strings can be single or double-quoted. Triple single quotes is for long strings. r'raw \.string' is a raw strings
+* strings can be single or double-quoted(abs no diff. This helps to avoid escaping either). Triple single quotes is for long strings. r'raw \.string' is a raw strings
 * + is a way to concatenate strings
 
 a.splitlines()       # list of lines. The restult wont have carriage returns.
@@ -141,6 +141,9 @@ a.replace()
 a.strip()            # trim whitespaces
 a.rstrip()
 a.lstrip()
+
+ord(a)    # gives the ordinal value of a, give just one char as input
+chr(num)  # inverse of ord
 
 bytes
 -----
@@ -275,6 +278,7 @@ closures
 * The state is set up in the closure at the time of its creation.
 * The closure can mutate its state during every invocation
 * Multiple instances of the same closure function can have different states.
+* At the outset, you will see a function having a inner function, and returning the inner function
 
 A closure is typically created like this
 
@@ -289,6 +293,19 @@ def create_a_closure(state1_for_closure):
 
 #Later
 a_closure = create_a_closure("intial_value_for_state1")
+
+decorators
+-----------
+
+* The intent of a decorator is to wrap around any function with added behavior
+* You write a closure like situation, where a function takes one function as arg, which defines a inner funciton and returns it.
+* The inner funciton does fancy stuff (and calling the actual supplied function)
+* Later you can just use the decorator syntax 
+@decorator_name
+def function_that_will_be_wrapped(...):
+  ...
+
+* Users just invoke normally with function_that_will_be_wrapped() and that gets wrapped by the decorator
 
 itertools
 ----------
@@ -447,8 +464,14 @@ os.makedirs(path)   # no mkdir -p option.. just check isdir and then do this or 
 
 import subprocess
 subprocess.call(["ls","-l"])   # Just run it clobbering ur stdout with the cmd's stdout.
-subprocess.getoutput("ls -1")  # Run and get the o/p as return value
+subprocess.check_output("ls -1")  # Run and get the o/p as return value
 
+or
+
+a=subprocess.Popen(["ls","-l"],stdout=subprocess.PIPE)
+output=a.communicate()
+a.wait()
+print output[0]
 
 import glob
 list_of_filenames=glob.glob("*.py")
@@ -471,6 +494,13 @@ uf = urllib.urlopen('http://google.com')
 file_page = uf.read()
 
 urllib.urlretrive('http://google.com/intl/en_ALL/images/logo.gif', 'blah.gif')
+
+pexpect
+--------
+
+child=pexpect.spawn("cmd",["arg1","arg2"])
+result=child.pexpect(["regex1","regex2"])   
+
 
 Find python version
 -------------------
