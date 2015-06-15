@@ -501,6 +501,17 @@ pexpect
 child=pexpect.spawn("cmd",["arg1","arg2"])
 result=child.pexpect(["regex1","regex2"])   
 
+logging
+--------
+
+import logging
+logging.basicConfig(filename="abc.log", level=logging.DEBUG)
+# mode='w', will erase existing log file
+
+logging.debug("This is a debug message")
+
+sess_logger = logging.getLogger("SESS")
+sess_logger.debug("This is a session subsystem log")
 
 Find python version
 -------------------
