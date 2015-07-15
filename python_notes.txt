@@ -368,10 +368,10 @@ Reading file line by line:
 
 
 with open("file","r") as fp:
-  for i in fp:                  # This is efficient on large files.
+  for i in fp:                  # This is efficient on large files. so *ok for big files*
     print(i)
 
-f.readlines()   # gives each line of file in a list.. Note: Entire file is gobbled in one-go. Useful only for small files.
+f.readlines()   # gives each line of file in a list.. Note: Entire file is gobbled in one-go. Useful *only for small files.*
 f.read()        # gets entire file as one big string. Again, use for small files only.
 
 Reading line by line from stdin:
@@ -437,7 +437,7 @@ exiting from python
 
 sys.exit(0)
 
-regular expression
+regular expression  regexp regex
 ------------------
 
 import re
