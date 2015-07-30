@@ -384,6 +384,8 @@ import sys
 for line in sys.stdin:
   print line
 
+for line_number, line in enumerate(fd):   # will also get line-number along
+
 User input
 ----------
 
@@ -461,6 +463,8 @@ os.path.realpath(path)  # resolves sym-links!
 os.path.exists('path/to/file')
 os.path.isdir('path/to/dir')
 os.makedirs(path)   # no mkdir -p option.. just check isdir and then do this or do , catch except (latter better)
+os.getcwd()         # get cwd pwd
+os.path.dirname(os.path.realpath(__file__))   # get dir of current file
 
 import subprocess
 subprocess.call(["ls","-l"])   # Just run it clobbering ur stdout with the cmd's stdout.
@@ -507,10 +511,12 @@ logging
 import logging
 logging.basicConfig(filename="abc.log", level=logging.DEBUG)
 # mode='w', will erase existing log file
+# DEBUG, INFO, WARNING, ERROR, CRITICAL, FATAL
 
 logging.debug("This is a debug message")
 
 sess_logger = logging.getLogger("SESS")
+sess_logger.setLevel(logging.DEBUG)
 sess_logger.debug("This is a session subsystem log")
 
 Find python version
