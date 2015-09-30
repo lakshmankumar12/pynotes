@@ -35,7 +35,7 @@ tuples
 sets
 dictionaries
 
-* use type(varaible) to check the type of a variable.
+* use type(variable) to check the type of a variable.
 
 List
 ----
@@ -64,7 +64,14 @@ value in a # boolean expression to check if value is in a list. WORKS FOR STRING
 for value in a:
   # .. use value
 
-+ operator concaetanates lists
++ operator concatenates lists
+
+list.sort()  -> sorts the list in place. So better than sorted(list) if u dont need orig-list.
+             -> sorted() takes any iterable, but list.sort() is available only for lists.
+Both sorted and list.sort() take a named key arg. This is a function with one-arg and returns
+         a value, which is used as the value to be sorted. (Efficient as this func is called 
+         only once for each member). Lambda's are typically used here..
+
 
 Tuples
 -----
@@ -122,7 +129,7 @@ so is it with dictionary and set comprehesion
 strings
 ---------
 
-* Every string is a UTF-8 encoded sequence of characters.
+* Every string is a UTF-8 encoded sequence of characters in python-3.
 * strings can be single or double-quoted(abs no diff. This helps to avoid escaping either). Triple single quotes is for long strings. r'raw \.string' is a raw strings
 * + is a way to concatenate strings
 
@@ -240,6 +247,18 @@ Magic attributes of a class
 
 n.__class__    # reference to a object of type class, which represents the class-definition
 n.__doc__      # reference to the doc-string
+
+lambda
+-------
+
+lambda arg1 [, arg2,..]: manipulate(args)
+
+map
+---
+
+Gives a generator, where the given fn is applied on the list provided.
+
+map (fn_to_apply, list_of_inputs)
 
 Iterators
 ---------
@@ -499,6 +518,12 @@ uf = urllib.urlopen('http://google.com')
 file_page = uf.read()
 
 urllib.urlretrive('http://google.com/intl/en_ALL/images/logo.gif', 'blah.gif')
+
+requests
+--------
+
+r = requests.get('https://api.github.com/user', auth=('user', 'pass'))
+
 
 pexpect
 --------
