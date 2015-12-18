@@ -228,6 +228,11 @@ class Name:
     pass                        #all member function's first arg is self.
     Name.count++;               #refering a Name.member brings in a c++-style static member of the class.
 
+  @staticmethod
+  def function(arg1):
+    pass                        # note the absence of self for member functions
+    Name.count++;               #refering a Name.member brings in a c++-style static member of the class.
+
 
 #Later..
 n = Name(10,12)
@@ -237,6 +242,7 @@ n = Name(10,12)
   fixed-set of attributes for a class
   n.newAttribute = "abc"   # is perfectly valid anywhere!
 * ClassName.var_name  # when used with ClassName refers to a var_name in class-scope(static like)
+                      # DONT FORGET the ClassName - otherwise, it just uses/refers to a local var.
 * methods in the class can work on static members as long as they use ClassName to scope it.
 * But instance_var.var_name  # when assigned to, will create a instance level attribute!
 
@@ -379,6 +385,8 @@ Various ways to catch exceptions:
 
 except IOError as e:
   e.whatever..
+  e.errno
+  e.strerror
 
 
 
@@ -406,7 +414,7 @@ for line in sys.stdin:
 
 for line_number, line in enumerate(fd):   # will also get line-number along
 
-User input
+User input (from stdin, keyboard)
 ----------
 
 variable=input("Prompt string w/o newline:")     # Gets user-input and interprets it as a python-expression! Thus unquoted string-literals are interpreted as var-names
@@ -558,6 +566,11 @@ Find python version
 -------------------
 
 python -v
+
+To make a script run if its main
+--------------------------------
+
+if __name__ == "__main__":
 
 
 Python Internals
