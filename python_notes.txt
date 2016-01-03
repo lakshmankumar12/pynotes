@@ -44,7 +44,10 @@ List
 * list elements are indexed from 0 and name[0] is the way to get one element
 * -1 is the last element.
 * slicing is first index to *one before* the second index.
-* Slicing creates a copy, so a[:] is a shorthand for getting a copy of a list
+* slicing generally creates a reference to a list. However, in the a[:] form,
+  Slicing creates a copy, so a[:] is a shorthand for getting a copy of a list
+* l[:size] -> will give u first size elements
+* l[size:] -> will give u from size'th index (i.e size+1th element) till end
 * lists never have gaps
 
 len(a)
@@ -212,6 +215,15 @@ or
 not
 
 
+variable args to function
+-------------------------
+
+def manyArgs(arg1, arg2, *args, **kwargs):
+  #arg1, arg2 are std args
+  #args is a tuple of all unnamed args
+  #kwargs is a dict of all named args
+
+
 
 class
 -----
@@ -360,6 +372,9 @@ string.format(args)
 
 older pythong:
 
+# use this and use print statement.
+from __future__ import print_function
+
 print "format string %d, %s, %s"%(int_var,str_var,"string literal")
 
 
@@ -480,6 +495,9 @@ a = re.findall (pat, haystack)  # gets the list of all matches.. if he pat has (
 
 a = re.sub(pat,replacement,count=0,flags=0)  # replace can use \1 to backref.
 
+#remove invalid filename chars for windows
+valid_filename = re.sub(r'[\\/:"*?<>|]+', "", var_having_junk_chars)
+
 os-package (file manipulation stuff)
 ----------
 
@@ -507,6 +525,13 @@ print output[0]
 
 import glob
 list_of_filenames=glob.glob("*.py")
+
+random
+-------
+
+random.seed([x])    # x is any hashanble object. if none is passed, sys-time is used.
+random.shuffle(x)   # shuffles list x in place.
+random.randint(a,b) # get a random int from [a,b], both included
 
 time
 ----
