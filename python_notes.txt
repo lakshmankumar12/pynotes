@@ -521,6 +521,11 @@ import subprocess
 subprocess.call(["ls","-l"])   # Just run it clobbering ur stdout with the cmd's stdout.
 subprocess.check_output("ls -1")  # Run and get the o/p as return value
 
+boolean_variable=os.access("/path/to/file",os.F_OK)  # does file exist at all
+boolean_variable=os.access("/path/to/file",os.R_OK)
+boolean_variable=os.access("/path/to/file",os.W_OK)
+boolean_variable=os.access("/path/to/file",os.X_OK)
+
 or
 
 a=subprocess.Popen(["ls","-l"],stdout=subprocess.PIPE)
