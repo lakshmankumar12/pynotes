@@ -388,6 +388,7 @@ except IOError:
 # Note its except and not expect
 
 * No one defines what exceptions will be raised. We handle every possible exception
+* keyword to throw in python is raise
 
 def function():
   ...;
@@ -403,6 +404,10 @@ except IOError as e:
   e.errno
   e.strerror
 
+Capture all Exceptions!
+
+except Exception,e:
+  print str(e)
 
 
 
