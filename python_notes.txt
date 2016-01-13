@@ -53,7 +53,7 @@ List
 len(a)
 a.append(one_value)
 a.extend([list])
-a.insert(index,value)
+a.insert(index,value)  # Use this for inserting at head/index-0 !
 del a[index]   # list size reduced by one. and all indices index+1:<end> .. become index:<end>
 a.pop()  # pops the last index, gets a IndexError when we pop a empty list. List reduces after pop.
 a.pop(index)  # pops given index
@@ -498,7 +498,7 @@ m.group(1)  # gets the 1st left paren group.
 
 a = re.findall (pat, haystack)  # gets the list of all matches.. if he pat has (), then it gets back a list of tuples
 
-a = re.sub(pat,replacement,count=0,flags=0)  # replace can use \1 to backref.
+a = re.sub(pat,replacement,src_string,count=0,flags=0)  # replace can use \1 to backref.
 
 #remove invalid filename chars for windows
 valid_filename = re.sub(r'[\\/:"*?<>|]+', "", var_having_junk_chars)
