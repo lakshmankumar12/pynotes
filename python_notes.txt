@@ -365,6 +365,8 @@ print "happy arg:%d"%arg,  # the trailing comman skips the newline
 print('.',end="",flush=True)   # to control "\n" and flushing  .. only in python 3
 sys.stdout.flush()  # in python 2
 
+print('string',file=sys.stdout)  # to a file
+
 string.format(args)
 '{0} {1:2d}'.format(s,i)
 
@@ -418,6 +420,8 @@ Reading file line by line:
 with open("file","r") as fp:
   for i in fp:                  # This is efficient on large files. so *ok for big files*
     print(i)
+
+with open("file","r") as fp, open("second-file","r") as fp2:   # for multiple files
 
 f.readlines()   # gives each line of file in a list.. Note: Entire file is gobbled in one-go. Useful *only for small files.*
 f.read()        # gets entire file as one big string. Again, use for small files only.
@@ -532,6 +536,12 @@ a=subprocess.Popen(["ls","-l"],stdout=subprocess.PIPE)
 output=a.communicate()
 a.wait()
 print output[0]
+
+# You can stack as many commands with a pipe arrangement.
+# each command is one invocation to Popen, with its stdout/stderr set to the previous commands pipe.
+# You can use subprocess.PIPE to ask popen to give you a pipe. THis is obtained by a call to communicate.
+# the wait will wait till the command is done.
+# The result of communicate is like a string, ready for processing.
 
 import glob
 list_of_filenames=glob.glob("*.py")
