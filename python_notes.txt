@@ -265,6 +265,9 @@ Magic attributes of a class
 
 n.__class__    # reference to a object of type class, which represents the class-definition
 n.__doc__      # reference to the doc-string
+n.__repr__     # is a function, that will used to stringize the class. 
+               # Tip, it takes mandorty self, u can actaully pass more args
+               # as long as u have default-args.
 
 lambda
 -------
@@ -617,9 +620,36 @@ To make a script run if its main
 
 if __name__ == "__main__":
 
+Curses
+------
+
+* window - is an internal representation containing an image of a part of the screen.
+* screen - is a window with the size of the entire screen (from the upper left to the lower right)
+* WINDOW stdscr - standard screen
+
 
 Python Internals
 ---------------
 
 Every name you see is a reference/pointer to an object.
 The underlying object is either an immutable object or a mutable object.
+
+Python library mgmt
+--------------------
+
+Typically python stores all its libraries in 
+
+/usr/local/lib/python<ver>/site-packages
+/usr/local/python<ver>/dist-packages
+
+sudo apt-get install python-pip
+
+and then
+
+pip install <blah-blah>
+
+or if u get the source
+
+cd the-new-stuff
+python ./setup.py install   # use the right python-version to install in its location
+
