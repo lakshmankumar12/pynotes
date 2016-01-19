@@ -62,6 +62,11 @@ a.index(value)  # gives index of the value.
 sorted(a)   # Gives a new list which is sorted a.
 str.join(a)  # joins each element in a with str as the joining character .. eg: '\n'.join(a)
 
+#LIFO (stack) -> append/pop() is equialent of push/pop
+#FIFO (queue) -> append/pop(0) is equialent of insert_tail/pop_head
+                 insert(0,val)/pop() is equialent of insert_head/pop_tail
+
+
 value in a # boolean expression to check if value is in a list. WORKS FOR STRING AS WELL
 
 for value in a:
@@ -440,6 +445,8 @@ for line in sys.stdin:
   print line
 
 for line_number, line in enumerate(fd):   # will also get line-number along
+
+enumerate(iterable,start_value=0)         # will start value from start_value
 
 User input (from stdin, keyboard)
 ----------
