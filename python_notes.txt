@@ -377,6 +377,7 @@ print('string',file=sys.stdout)  # to a file
 
 string.format(args)
 '{0} {1:2d}'.format(s,i)
+'{0:b}'.format(i)               # is a quick way to print a number in binary
 
 {arg-position:<width><type>}  # default type is string
 
