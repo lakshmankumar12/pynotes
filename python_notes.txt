@@ -243,6 +243,7 @@ class Name:
 
   def function(self,arg1):
     pass                        #all member function's first arg is self.
+    self.anotherMember(arg2)    #remember to put the self before calling another member from member
     Name.count++;               #refering a Name.member brings in a c++-style static member of the class.
 
   @staticmethod
@@ -518,6 +519,12 @@ a = re.sub(pat,replacement,src_string,count=0,flags=0)  # replace can use \1 to 
 #remove invalid filename chars for windows
 valid_filename = re.sub(r'[\\/:"*?<>|]+', "", var_having_junk_chars)
 
+# if u are using a regex a lot, pre-compile it
+
+pat_object = re.compile(pattern,flags)
+pat_object.search(haystack)
+pat_object.match(check_exact_match_input)
+
 os-package (file manipulation stuff)
 ----------
 
@@ -556,6 +563,9 @@ print output[0]
 
 import glob
 list_of_filenames=glob.glob("*.py")
+
+import sh
+a=sh.ls('-1','.')
 
 random
 -------
