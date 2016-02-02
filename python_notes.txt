@@ -121,6 +121,12 @@ a.keys()    # gives a list of keys of dictionary a, not necesarily in sorted ord
 a.vaues()   # gives a list of values
 a.items()   # gives a list of tuple of (key, value) from a dictionary
 
+#when iterating over dict, u typically iterate over keys
+for key in a_dict:
+
+# if u need boht key and value, then use iteritems
+for key,value in a_dict.iteritems()
+
 orig_dict.update(another_dict)
 
 List comprehesion
@@ -582,6 +588,30 @@ time
 >>> time.localtime(st_mtime)
 time.struct_time(tm_year=2009, tm_mon=7, tm_mday=13, tm_hour=14, tm_min=25, tm_sec=44, tm_wday=0, tm_yday=194, tm_isdst=1)
 >>>
+
+Enums /enum
+-----
+
+from enum import Enum
+
+class Color(Enum):
+  Red = 1
+  Yellow = 2
+
+#Iterate over all enums
+for c in Color:
+  print (c)         # will print Color.Red, Color.Yellow
+
+#To get string/number against a enum
+Color.Red.name
+Color.Red.value
+
+#if u have number, to get enum object
+Color(1)
+
+#if u have string, to get enum object
+Color['Red']
+
 
 urllib
 ------
