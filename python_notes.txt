@@ -159,6 +159,8 @@ a.index()
 haystack.find(needle [,start [,end]])  # give index in haystack where needle is found, -1 on failure, start:end as in slicing
 a.replace()
 
+a.rfind()  # find from end.
+
 a.strip()            # trim whitespaces
 a.rstrip()
 a.lstrip()
@@ -369,6 +371,9 @@ itertools.groupby(iterable,keyfunc)             -> listof (keyvalue, sub-iterato
 itertools.chain(it1,it2,..itn)                  -> single iterator that goes over all
 itertools.zip(it1,it2,..itn)                    -> single iterator that goes over tuples of members of all iterables. Stops at shorted.
 itertools.zip_longest(it1,it2,..itn)            -> ..zip till longes, filling None for thse that are over.
+
+#infinte iterators
+itertools.cycle(iterable)                       -> keeps cycling on the iterable endlessly
 
 Simple commands
 ----------------
@@ -588,6 +593,20 @@ time
 >>> time.localtime(st_mtime)
 time.struct_time(tm_year=2009, tm_mon=7, tm_mday=13, tm_hour=14, tm_min=25, tm_sec=44, tm_wday=0, tm_yday=194, tm_isdst=1)
 >>>
+
+datetime
+---------
+
+datetime.datetime.today()
+datetime.datetime.now()    # same as today, but can accept a tz as optional name arg
+
+datetime.datetime.strptime('time-in-string','format')   # read a time in a string in.
+datetime.datetime.strftime('format')                    # print a time in a string
+
+%d - 0 padded 2 digit date
+%m - 0 padded 2 digit mth
+%Y - 4 digit year
+%a - 3 digit weekday
 
 Enums /enum
 -----
