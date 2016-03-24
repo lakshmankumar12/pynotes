@@ -60,7 +60,7 @@ a.pop(index)  # pops given index
 a.remove(value)  # pops vlaue. raises ValueError if value is not found
 a.index(value)  # gives index of the value.
 sorted(a)   # Gives a new list which is sorted a.
-str.join(a)  # joins each element in a with str as the joining character .. eg: '\n'.join(a)
+str.join(list_x)  # joins each element in list_x with str as the joining character .. eg: ' '.join(['hello','world'])
 
 #LIFO (stack) -> append/pop() is equialent of push/pop
 #FIFO (queue) -> append/pop(0) is equialent of insert_tail/pop_head
@@ -461,6 +461,11 @@ for line_number, line in enumerate(fd):   # will also get line-number along
 
 enumerate(iterable,start_value=0)         # will start value from start_value
 
+To find if a variable is a list/scalar
+
+if isinstance(var_name, list):
+
+
 User input (from stdin, keyboard)
 ----------
 
@@ -545,32 +550,51 @@ os.path.join(dir,filename)
 os.path.abspath(path)
 os.path.realpath(path)  # resolves sym-links!
 os.path.exists('path/to/file')
-os.path.isdir('path/to/dir')
 os.makedirs(path)   # no mkdir -p option.. just check isdir and then do this or do , catch except (latter better)
 os.getcwd()         # get cwd pwd
 os.path.dirname(os.path.realpath(__file__))   # get dir of current file
 
+os.path.isfile('path')  # true if its regular file or sym-link to regular file
+os.path.islink('path')  # true if its a sym link
+os.path.isdir('path')   # true if its a dir or a sym link to a dir
+
+
+# for quick and directy commands
+os.system("your command")
+
 import subprocess
 subprocess.call(["ls","-l"])   # Just run it clobbering ur stdout with the cmd's stdout.
-subprocess.check_output("ls -1")  # Run and get the o/p as return value
+subprocess.check_output(["ls","-1"])  # Run and get the o/p as return value
 
 boolean_variable=os.access("/path/to/file",os.F_OK)  # does file exist at all
 boolean_variable=os.access("/path/to/file",os.R_OK)
 boolean_variable=os.access("/path/to/file",os.W_OK)
 boolean_variable=os.access("/path/to/file",os.X_OK)
 
+To recursively walk a dir
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# os.walk gives a generator that recurses into dirs.
+# So our code looks nice and iterative!
+for root, _, files in os.walk(sys.argv[1]):
+  for f in files:
+    fname = os.path.join(root, f)
+    print(fname)
+
+
+
 or
 
-a=subprocess.Popen(["ls","-l"],stdout=subprocess.PIPE)
-output=a.communicate()
-a.wait()
-print output[0]
+a=subprocess.Popen(["ls","-l"],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+output,err=a.communicate('Any string as in input if needed')
+errcode = a.wait()
+print output
 
-# You can stack as many commands with a pipe arrangement.
 # each command is one invocation to Popen, with its stdout/stderr set to the previous commands pipe.
 # You can use subprocess.PIPE to ask popen to give you a pipe. THis is obtained by a call to communicate.
-# the wait will wait till the command is done.
+# the wait will wait till the command is done. errcode is the process return code. 0 if success, non-0 iff ailure
 # The result of communicate is like a string, ready for processing.
+# You can stack as many commands with a pipe arrangement.
 
 import glob
 list_of_filenames=glob.glob("*.py")
@@ -606,6 +630,7 @@ datetime.datetime.strftime('format')                    # print a time in a stri
 %d - 0 padded 2 digit date
 %m - 0 padded 2 digit mth
 %Y - 4 digit year
+%H,%M,%S - 24-hr,min,sec as 0-padded-2-digit-numbers
 %a - 3 digit weekday
 
 Enums /enum
@@ -642,11 +667,42 @@ file_page = uf.read()
 
 urllib.urlretrive('http://google.com/intl/en_ALL/images/logo.gif', 'blah.gif')
 
+import urllib2, base64
+
+request = urllib2.Request("http://api.foursquare.com/v1/user")
+base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+request.add_header("Authorization", "Basic %s" % base64string)   
+result = urllib2.urlopen(request)
+
 requests
 --------
 
 r = requests.get('https://api.github.com/user', auth=('user', 'pass'))
 
+dictvar = requests.utils.dict_from_cookiejar(cookiejar)
+cookies = requests.utils.cookiejar_from_dict(dictvar)
+
+beautiful soup
+--------------
+
+import bs4
+
+soup = bs4.BeautifulSoup(html_data,'html.parser')
+
+# Look at the parts of a tag
+tags = soup('a')
+first_tag = tags[0]
+print 'TAG:',first_tag
+print 'URL:',first_tag.get('href', None)
+print 'Contents:',first_tag.contents[0]
+print 'Attrs:',first_tag.attrs
+
+pickle
+-------
+
+pickle.dump(object_to_dump, write_file_handle)
+
+ob = picke.load(read_file_handle)
 
 pexpect
 --------
@@ -720,3 +776,7 @@ or if u get the source
 cd the-new-stuff
 python ./setup.py install   # use the right python-version to install in its location
 
+reload a module in interpreter
+------------------------------
+
+reload(module_name)
