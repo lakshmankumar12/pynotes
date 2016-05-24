@@ -164,6 +164,7 @@ a.rfind()  # find from end.
 a.strip()            # trim whitespaces
 a.rstrip()
 a.lstrip()
+a.replace(what_to_replace,to_replace_with,[,max])   #bbbbbb
 
 ord(a)    # gives the ordinal value of a, give just one char as input
 chr(num)  # inverse of ord
@@ -492,12 +493,14 @@ parser.add_argument("-v","--verbose", help="increase output verbosity", action="
 parser.add_argument("-v","--verbose", help="increase output verbosity", action="count")            # captures how many times --verbosity was present in arg-list. No arg per-se for this option.
 parser.add_argument("-v","--verbose", help="increase output verbosity", type=int)                  # --verbosity <int>
 parser.add_argument("-v","--verbose", help="increase output verbosity", type=int, choices=[0,1,2]) # --verbosity <0|1|2>
-parser.add_argument("square",   help="display a square of a given number (this is a mandatory argment)", type=int)
-parser.add_argument("optional", help="User may skip this", nargs="?", default="abc")
+parser.add_argument("str_arg",   help="give a string argument (this is a mandatory argment)")
+parser.add_argument("int_arg",   help="give a int arg (this is a mandatory argment)", type=int)
+parser.add_argument("optional",  help="User may skip this", nargs="?", default="abc")
 parser.add_argument("many_optional", help="User may give zero or  more of this and this will be a list", nargs="*", default=["a","b"])
 
-args = parser.parse_args()
-if args.verbose:
+parsed_args = parser.parse_args()
+parser.add_argument("-v","--verbose", help="increase output verbosity", action="store_true")       # captures if --verbosity present or not in arg-list. No arg per-se for this option.
+if parsed_args.verbose:
       print("verbosity turned on")
 
 also:
@@ -533,7 +536,7 @@ a = re.findall (pat, haystack)  # gets the list of all matches.. if he pat has (
 a = re.sub(pat,replacement,src_string,count=0,flags=0)  # replace can use \1 to backref.
 
 #remove invalid filename chars for windows
-valid_filename = re.sub(r'[\\/:"*?<>|]+', "", var_having_junk_chars)
+valid_filename = re.sub(r'[\\/:"*?<>|]+', "_", var_having_junk_chars)
 
 # if u are using a regex a lot, pre-compile it
 
@@ -552,6 +555,7 @@ os.path.realpath(path)  # resolves sym-links!
 os.path.exists('path/to/file')
 os.makedirs(path)   # no mkdir -p option.. just check isdir and then do this or do , catch except (latter better)
 os.getcwd()         # get cwd pwd
+os.chdir(path)      # cd to a working-dir
 os.path.dirname(os.path.realpath(__file__))   # get dir of current file
 
 os.path.isfile('path')  # true if its regular file or sym-link to regular file
@@ -560,7 +564,7 @@ os.path.isdir('path')   # true if its a dir or a sym link to a dir
 
 
 # for quick and directy commands
-os.system("your command")
+os.system("your command with all args in a single string")
 
 import subprocess
 subprocess.call(["ls","-l"])   # Just run it clobbering ur stdout with the cmd's stdout.
