@@ -121,6 +121,8 @@ a.keys()    # gives a list of keys of dictionary a, not necesarily in sorted ord
 a.vaues()   # gives a list of values
 a.items()   # gives a list of tuple of (key, value) from a dictionary
 
+a.pop(key [, default])   # dels the key and returns its value. If key isn't present default is given. If default isn't supplied KeyError is generated
+
 #when iterating over dict, u typically iterate over keys
 for key in a_dict:
 
@@ -273,6 +275,10 @@ n = Name(10,12)
 * methods in the class can work on static members as long as they use ClassName to scope it.
 * But instance_var.var_name  # when assigned to, will create a instance level attribute!
 
+class Derived(Base):
+  def __init__(self, derived_args):
+    Base.__init__(self, base_args)
+    self.derived_member = derived_args
 
 
 Magic attributes of a class
@@ -497,6 +503,8 @@ parser.add_argument("str_arg",   help="give a string argument (this is a mandato
 parser.add_argument("int_arg",   help="give a int arg (this is a mandatory argment)", type=int)
 parser.add_argument("optional",  help="User may skip this", nargs="?", default="abc")
 parser.add_argument("many_optional", help="User may give zero or  more of this and this will be a list", nargs="*", default=["a","b"])
+
+# dash- is converted to underscore
 
 parsed_args = parser.parse_args()
 parser.add_argument("-v","--verbose", help="increase output verbosity", action="store_true")       # captures if --verbosity present or not in arg-list. No arg per-se for this option.
@@ -756,6 +764,9 @@ logging.debug("This is a debug message")
 
 sess_logger = logging.getLogger("SESS")
 sess_logger.setLevel(logging.DEBUG)
+fh = logging.FileHandler('session.log')
+fh.setLevel(logging.DEBUG)
+sess_logger.add_handler(fh)
 sess_logger.debug("This is a session subsystem log")
 
 Post a json object
