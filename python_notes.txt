@@ -580,10 +580,24 @@ To recursively walk a dir
 
 # os.walk gives a generator that recurses into dirs.
 # So our code looks nice and iterative!
-for root, _, files in os.walk(sys.argv[1]):
+for subdir, dirs, files in os.walk(a_given_dir):
+  print "files in %s"%subdir
   for f in files:
-    fname = os.path.join(root, f)
+    fname = os.path.join(subdir, f)
     print(fname)
+  print "dirs in %s"%subdir
+  for f in dirs:
+    fname = os.path.join(subdir, f)
+    print(fname)
+
+To just list one level
+~~~~~~~~~~~~~~~~~~~~~~
+
+os.listdir(given_dir)
+
+To filter only dirs:
+[ name for name in os.listdir(given_dir) if os.path.isdir(os.path.join(given_dir, name)) ]
+ 
 
 
 
