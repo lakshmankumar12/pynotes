@@ -183,6 +183,12 @@ a.decode('ascii')    # gives a string object.
 bytes like string is immutable
 bytearray is mutuable
 
+Import path
+-----------
+
+sys.path is the list of locations looked fork
+
+
 control structures
 ------------------
 
