@@ -183,11 +183,27 @@ a.decode('ascii')    # gives a string object.
 bytes like string is immutable
 bytearray is mutuable
 
+Extra ones.
+----------
+
+collections.deque
+   -> like list, but has front and back at O(1)
+
+collections.orderedDict
+   -> A bit useless. Order is maintained on insertion order of keys.
+   -> This is more standard than the SortedContainers below. So use this if it solves the purpose
+
+SortedContainers.sortedDict
+   -> A proper dict based on key.
+   -> Looks like there is getNextAfterKey()/..Before.. [use bisect() and peekItem()]
+
+llist.dllist
+  -> A doubly linked list in python. If you really wanted a linked list.
+
 Import path
 -----------
 
 sys.path is the list of locations looked fork
-
 
 control structures
 ------------------
@@ -651,6 +667,8 @@ random
 random.seed([x])    # x is any hashanble object. if none is passed, sys-time is used.
 random.shuffle(x)   # shuffles list x in place.
 random.randint(a,b) # get a random int from [a,b], both included
+random.sample(iterable,k=1)  # gets a k-sized tuple of items from iterable.
+
 
 time
 ----
