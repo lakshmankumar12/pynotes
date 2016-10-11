@@ -262,6 +262,11 @@ def manyArgs(arg1, arg2, *args, **kwargs):
   #kwargs is a dict of all named args
 
 
+swap 2 variables
+----------------
+
+a,b = b,a
+
 
 class
 -----
@@ -281,7 +286,7 @@ class Name:
 
   @staticmethod
   def function(arg1):
-    pass                        # note the absence of self for member functions
+    pass                        # note the absence of self for static member functions. Invoked as ClassName.function()
     Name.count++;               #refering a Name.member brings in a c++-style static member of the class.
 
 
@@ -793,6 +798,16 @@ fh.setLevel(logging.DEBUG)
 sess_logger.add_handler(fh)
 sess_logger.debug("This is a session subsystem log")
 
+Daemonizing
+----------
+
+import daemon
+
+with daemon.DaemonContext():
+    #whatever u want to daemonize
+    main()
+
+
 Post a json object
 ------------------
 
@@ -844,6 +859,9 @@ or if u get the source
 
 cd the-new-stuff
 python ./setup.py install   # use the right python-version to install in its location
+
+#List all installed libraries.
+pip freeze
 
 reload a module in interpreter
 ------------------------------
