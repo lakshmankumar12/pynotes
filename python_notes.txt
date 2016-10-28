@@ -867,3 +867,19 @@ reload a module in interpreter
 ------------------------------
 
 reload(module_name)
+
+colorprint
+----------
+
+color_dict = { 'Black':0, 'Red':1, 'Green':2, 'Yellow':3,  'Blue':4,    'Magenta':5, 'Cyan':6,    'White':7 }
+
+CSI='\033['
+reset='\033[0m'
+
+normal_foreground=30
+normal_background=40
+high_foreground=90
+high_background=100
+
+                          # foreground                        #background
+chosen_color_prefix = CSI + str(30+color_dict[color]) + ';' + str(40+color_dict[color]) + 'm'
