@@ -37,6 +37,14 @@ dictionaries
 
 * use type(variable) to check the type of a variable.
 
+casting
+~~~~~~~
+
+str(anything)       # for class-types, it invokes __repr__ of the class
+int(string_var)
+float(strint_var)   # yes. it coverts to double precision
+
+
 List
 ----
 
@@ -409,6 +417,8 @@ itertools.zip_longest(it1,it2,..itn)            -> ..zip till longes, filling No
 #infinte iterators
 itertools.cycle(iterable)                       -> keeps cycling on the iterable endlessly
 
+reversed(iterable)                              -> native way to reverse any interable
+
 Simple commands
 ----------------
 
@@ -503,9 +513,12 @@ if isinstance(var_name, list):
 User input (from stdin, keyboard)
 ----------
 
+#what you probably need most of the time
+variable=raw_input("Prompt string w/o newline:") # Gets whatever is given and assigns to variable which is now a str. You then cast this string into whatever you want.
+
+#also know:
 variable=input("Prompt string w/o newline:")     # Gets user-input and interprets it as a python-expression! Thus unquoted string-literals are interpreted as var-names
                                                  # Most likely not what you want. But if you type in a int, your variable also holds a int-object directly.
-variable=raw_input("Prompt string w/o newline:") # Gets whatever is given and assigns to variable which is now a str. You then cast this string into whatever you want.
 
 Use readline library
 ~~~~~~~~~~~~~~~~~~~~
