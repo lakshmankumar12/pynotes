@@ -325,6 +325,8 @@ n.__repr__     # is a function, that will used to stringize the class.
                # Tip, it takes mandorty self, u can actaully pass more args
                # as long as u have default-args.
 
+hasattr(object, "member")  # check if object.member exists
+
 lambda
 -------
 
