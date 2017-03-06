@@ -664,6 +664,14 @@ print output
 # The result of communicate is like a string, ready for processing.
 # You can stack as many commands with a pipe arrangement.
 
+# To do this following
+#   ls *.mp3 | grep MS
+from subprocess import Popen, PIPE
+ls_process = Popen(['ls', '*.mp3'], stdout=PIPE)
+grep_process = Popen(['grep', 'ms'],stdin=ls_process.stdout, stdout=PIPE)
+ls_process.stdout.close() # enable write error in ls if grep dies
+out, err = grep_process.communicate()
+
 import glob
 list_of_filenames=glob.glob("*.py")
 
