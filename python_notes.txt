@@ -613,7 +613,7 @@ os.path.islink('path')  # true if its a sym link
 os.path.isdir('path')   # true if its a dir or a sym link to a dir
 
 
-# for quick and directy commands
+# for quick and directy commands. Command o/p comes to stdout.
 os.system("your command with all args in a single string")
 
 import subprocess
@@ -801,8 +801,14 @@ pexpect
 --------
 
 child=pexpect.spawn("cmd",["arg1","arg2"])
-result=child.pexpect(["regex1","regex2",pexpect.EOF], timeout=120)
-#result is 0-based index in the list
+try:
+  result=child.pexpect(["regex1","regex2"], timeout=120)
+  #result is 0-based index in the list
+  #unfortunately EOF and TIMEOUT are always exceptions
+except pexpect.EOF:
+  #pass
+except pexpect.TIMEOUT:
+  
 
 logging
 --------
