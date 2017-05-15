@@ -602,7 +602,7 @@ os.path.join(dir,filename)
 (filename,extension) = os.path.splitext("filename.ext")  # note the spelling split-ext
 os.path.abspath(path)
 os.path.realpath(path)  # resolves sym-links!
-os.path.exists('path/to/file')
+os.path.exists('path/to/file')      #file check present
 os.makedirs(path)   # no mkdir -p option.. just check isdir and then do this or do , catch except (latter better)
 os.getcwd()         # get cwd pwd
 os.chdir(path)      # cd to a working-dir
