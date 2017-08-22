@@ -1,0 +1,21 @@
+Install django
+----------------
+
+pip3 install django
+
+
+Start a django project
+---------------------
+
+~/.local/bin/django-admin startproject mysite
+django-admin startproject mysite
+
+Start a demo-server
+--------------------
+
+python3 manage.py runserver
+
+Start a app
+-----------
+
+python manage.py startapp polls
