@@ -89,6 +89,7 @@ Both sorted and list.sort() take a named key arg. This is a function with one-ar
          only once for each member). Lambda's are typically used here..
 
 
+
 Tuples
 -----
 
@@ -178,6 +179,14 @@ a.replace(what_to_replace,to_replace_with,[,max])   #bbbbbb
 
 ord(a)    # gives the ordinal value of a, give just one char as input
 chr(num)  # inverse of ord
+
+UnicodeEncodeError
+~~~~~~~~~~~~~~~~~~
+
+ascii_form = unicode_data.encode('ascii','ignore')
+ascii_form = unicode_data.encode('ascii','replace')  # you get '?' for every non-ascii
+ascii_form = unicode_data.encode('ascii','xmlcharrefreplace')  # you get &#<num>; for every non-ascii
+
 
 bytes
 -----
@@ -315,7 +324,6 @@ class Derived(Base):
     Base.__init__(self, base_args)
     self.derived_member = derived_args
 
-
 Magic attributes of a class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -326,6 +334,19 @@ n.__repr__     # is a function, that will used to stringize the class.
                # as long as u have default-args.
 
 hasattr(object, "member")  # check if object.member exists
+setattr(object, "member", "value")
+
+Global scope
+------------
+
+var  = 5;     #global scope - outside of any function
+
+def func():
+  global var
+  var = 6        #updates global var as it explicity mentiond
+
+def func2()
+  var = 6        #silently creates a local var and uses that. Doesn't reflect glboal var.
 
 lambda
 -------
@@ -360,6 +381,17 @@ Generator
 * On susequent next()'s, code continues from yield till yield is hit again. Note taht all vars in
   the def block remember their values
 * When code falls off the def-block, we get StopIteration thrown to the next() caller.
+
+----
+# a generator that yields items instead of returning a list
+def firstn(n):
+    num = 0
+    while num < n:
+        yield num
+        num += 1
+
+sum_of_first_n = sum(firstn(1000000))
+----
 
 Generator expressions
 ---------------------
@@ -433,13 +465,21 @@ sys.stdout.flush()  # in python 2
 
 print('string',file=sys.stdout)  # to a file
 
+https://pyformat.info/
+
 string.format(args)
 '{0} {1:2d}'.format(s,i)
 '{0:b}'.format(i)               # is a quick way to print a number in binary
 
-{arg-position:<width><type>}  # default type is string
+By default format calls __format__ of the object.
+Use !r !s or !a to call __repr__, __str__, ascii()
+{0!r:}
 
-older pythong:
+align right/left/center : > , -, ^
+
+{<arg-position><convertion-flag>:<padding-char><align><width>.<trunc-width><type>}  # default type is string
+
+older python:
 
 # use this and use print statement.
 from __future__ import print_function
@@ -525,12 +565,25 @@ variable=input("Prompt string w/o newline:")     # Gets user-input and interpret
 Use readline library
 ~~~~~~~~~~~~~~~~~~~~
 import readline
+import atexit
+
 def rlinput(prompt, prefill=''):
   readline.set_startup_hook(lambda: readline.insert_text(prefill))
   try:
     return raw_input(prompt)
   finally:
     readline.set_startup_hook()
+
+historyPath = os.path.expanduser("~/.pyhistory")
+
+def save_history(historyPath=historyPath):
+    import readline
+    readline.write_history_file(historyPath)
+
+if os.path.exists(historyPath):
+    readline.read_history_file(historyPath)
+
+atexit.register(save_history)
 
 Arg parse
 --------
@@ -598,12 +651,12 @@ os-package (file manipulation stuff)
 ----------
 
 os.path.join(dir,filename)
-(dirname,filename) = os.path.split("abc/efg/file")
+(dirname,filename) = os.path.split("abc/efg/file")       # dirname basename
 (filename,extension) = os.path.splitext("filename.ext")  # note the spelling split-ext
 os.path.abspath(path)
 os.path.realpath(path)  # resolves sym-links!
 os.path.exists('path/to/file')      #file check present
-os.makedirs(path)   # no mkdir -p option.. just check isdir and then do this or do , catch except (latter better)
+os.makedirs(path)   # no mkdir -p option.. just check isdir and then do this or do , catch except OSError (latter better)
 os.getcwd()         # get cwd pwd
 os.chdir(path)      # cd to a working-dir
 os.path.dirname(os.path.realpath(__file__))   # get dir of current file
@@ -612,6 +665,14 @@ os.path.isfile('path')  # true if its regular file or sym-link to regular file
 os.path.islink('path')  # true if its a sym link
 os.path.isdir('path')   # true if its a dir or a sym link to a dir
 
+# create/make a new dir , mkdir
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
+os.rename(src,dst)   # mv in python
+
+os.remove(path)  #delete a file
+shutil.rmtree(dir_with_contents)  # just delete a dir / folder with contents
 
 # for quick and directy commands. Command o/p comes to stdout.
 os.system("your command with all args in a single string")
@@ -647,9 +708,6 @@ os.listdir(given_dir)
 
 To filter only dirs:
 [ name for name in os.listdir(given_dir) if os.path.isdir(os.path.join(given_dir, name)) ]
- 
-
-
 
 or
 
@@ -679,6 +737,22 @@ ls_process = Popen(['ls', '*.mp3'], stdout=PIPE)
 grep_process = Popen(['grep', 'ms'],stdin=ls_process.stdout, stdout=PIPE)
 ls_process.stdout.close() # enable write error in ls if grep dies
 out, err = grep_process.communicate()
+
+def execute_cmd(cmd, print_cmd=True, error_ok=False, print_op=False, dry_run=False):
+  if print_cmd:
+    print ("Executing :%s"%' '.join(cmd))
+  if dry_run:
+    return ""
+  a=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  output,err=a.communicate()
+  errcode = a.wait()
+  if err or (errcode != 0):
+    if not error_ok:
+       print("got a error,err:%s, errcode:%d"%(err,errcode))
+       sys.exit(1)
+  if print_op:
+    print("Got:\n%s"%output)
+  return output
 
 import glob
 list_of_filenames=glob.glob("*.py")
@@ -722,7 +796,9 @@ sleep(0.1) # Time in seconds.
 datetime
 ---------
 
-datetime.datetime.today()
+#Note: datetime module has 2 objects - date  and datetime. (And a timedelta)
+
+datetime.date.today()
 datetime.datetime.now()    # same as today, but can accept a tz as optional name arg
 
 datetime.datetime.strptime('time-in-string','format')   # read a time in a string in.
@@ -733,6 +809,10 @@ datetime.datetime.strftime('format')                    # print a time in a stri
 %Y - 4 digit year
 %H,%M,%S - 24-hr,min,sec as 0-padded-2-digit-numbers
 %a - 3 digit weekday
+
+datetime.timedelta is returned when you subtract 2 datetime.datetime objects
+
+date = datetime_obj + datetime.timedelta(days=30)
 
 Enums /enum
 -----
@@ -774,6 +854,12 @@ request = urllib2.Request("http://api.foursquare.com/v1/user")
 base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
 request.add_header("Authorization", "Basic %s" % base64string)   
 result = urllib2.urlopen(request)
+
+To supress warnings
+^^^^^^^^^^^^^^^^^^^
+
+import requests.packages.urllib3
+requests.packages.urllib3.disable_warnings()
 
 requests
 --------
@@ -834,6 +920,21 @@ fh = logging.FileHandler('session.log')
 fh.setLevel(logging.DEBUG)
 sess_logger.add_handler(fh)
 sess_logger.debug("This is a session subsystem log")
+
+* Note: logging defers calling the arg's __str__ function. Do
+
+logging.debug("This is fmt - %s and %s", some_object1, some_object2)
+The actual invocation of some_object1.__str__() doesn't happen if debug level is diabled.
+
+Context-manager
+---------------
+
+@contextmanager
+def change_dir_to(new_dir):
+  current_dir = os.getcwd()
+  os.chdir(new_dir)
+  yield
+  os.chdir(current_dir)
 
 Daemonizing
 ----------
@@ -900,9 +1001,13 @@ python ./setup.py install   # use the right python-version to install in its loc
 #List all installed libraries.
 pip freeze
 
+#list all files installed in a package
+pip show -f <package>
+
 reload a module in interpreter
 ------------------------------
 
+#import again / re import / reimport
 reload(module_name)
 
 colorprint
@@ -920,3 +1025,60 @@ high_background=100
 
                           # foreground                        #background
 chosen_color_prefix = CSI + str(30+color_dict[color]) + ';' + str(40+color_dict[color]) + 'm'
+
+from colorama import Fore, Back, Style
+
+colorama.init()
+print(Fore.RED + 'some red text')
+print(Back.GREEN + 'and with a green background')
+print(Style.DIM + 'and in dim text')
+print(Style.RESET_ALL)
+print('back to normal now')
+
+Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
+Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
+Style: DIM, NORMAL, BRIGHT, RESET_ALL
+
+
+Scapy
+------
+
+http://www.secdev.org/projects/scapy/files/scapydoc.pdf
+
+import scapy.all
+
+#capture
+sniff(iface="nap301",filter="udp",prn=lambda x:x.summary(),count=10)
+
+#convert pkt to str
+str(pkt)
+
+#list of fields values to stdout. Returns None
+ls(pkt)
+
+#print hexdump on stdout. Returns None
+hexdump(pkt)
+
+pkt.summary()
+pkt.show()
+
+pkt[IP]
+pkt[IP].src
+pkt[IP].dst
+pkt[IP][UDP]
+pkt[IP][UDP].sport
+pkt[IP][UDP].payload
+
+
+#ping
+dip="10.10.1.1"
+a=IP(dst=dip)/ICMP(id=RandShort(),seq=RandShort())/Raw("Random String")
+reply=sr1(a)
+
+#get o/p of tcpdump -xX
+IP(import_hexcap())
+0x0000:  4500 0034 8ecc 4000 4006 cfb8 0a1e 6402  E..4..@.@.....d.
+0x0010:  0a1e 6401 0516 e811 afc4 2bb6 ba8d 2c21  ..d.......+...,!
+0x0020:  8010 0041 143f 0000 0101 080a 2a32 2ab5  ...A.?......*2*.
+0x0030:  1add 66e8                                ..f.
+^D
