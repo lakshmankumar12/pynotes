@@ -85,7 +85,7 @@ for value in a:
 list.sort()  -> sorts the list in place. So better than sorted(list) if u dont need orig-list.
              -> sorted() takes any iterable, but list.sort() is available only for lists.
 Both sorted and list.sort() take a named key arg. This is a function with one-arg and returns
-         a value, which is used as the value to be sorted. (Efficient as this func is called 
+         a value, which is used as the value to be sorted. (Efficient as this func is called
          only once for each member). Lambda's are typically used here..
 
 
@@ -212,7 +212,7 @@ bytes
 defined as b'\xfe' or b'abc'
 
 a=b'\x65\x48'        # a bytes object
-a.decode('ascii')    # gives a string object. 
+a.decode('ascii')    # gives a string object.
                      # encode/decode complement bytes/str conversion
 
 bytes like string is immutable
@@ -351,7 +351,7 @@ Magic attributes of a class
 
 n.__class__    # reference to a object of type class, which represents the class-definition
 n.__doc__      # reference to the doc-string
-n.__repr__     # is a function, that will used to stringize the class. 
+n.__repr__     # is a function, that will used to stringize the class.
                # Tip, it takes mandorty self, u can actaully pass more args
                # as long as u have default-args.
 
@@ -452,7 +452,7 @@ decorators
 * The intent of a decorator is to wrap around any function with added behavior
 * You write a closure like situation, where a function takes one function as arg, which defines a inner funciton and returns it.
 * The inner funciton does fancy stuff (and calling the actual supplied function)
-* Later you can just use the decorator syntax 
+* Later you can just use the decorator syntax
 @decorator_name
 def function_that_will_be_wrapped(...):
   ...
@@ -897,7 +897,7 @@ import urllib2, base64
 
 request = urllib2.Request("http://api.foursquare.com/v1/user")
 base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
-request.add_header("Authorization", "Basic %s" % base64string)   
+request.add_header("Authorization", "Basic %s" % base64string)
 result = urllib2.urlopen(request)
 
 To supress warnings
@@ -947,7 +947,7 @@ try:
 except pexpect.EOF:
   #pass
 except pexpect.TIMEOUT:
-  
+
 
 logging
 --------
@@ -1063,7 +1063,7 @@ The underlying object is either an immutable object or a mutable object.
 Python library mgmt
 --------------------
 
-Typically python stores all its libraries in 
+Typically python stores all its libraries in
 
 /usr/local/lib/python<ver>/site-packages
 /usr/local/python<ver>/dist-packages
@@ -1100,7 +1100,7 @@ colorprint
 
 color_dict = { 'Black':0, 'Red':1, 'Green':2, 'Yellow':3,  'Blue':4,    'Magenta':5, 'Cyan':6,    'White':7 }
 
-CSI='\032['
+CSI='\033['
 reset='\033[0m'
 
 normal_foreground=30
