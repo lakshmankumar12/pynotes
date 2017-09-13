@@ -140,6 +140,24 @@ for key,value in a_dict.iteritems()
 
 orig_dict.update(another_dict)
 
+handy defaulting
+~~~~~~~~~~~~~~~~
+
+#first arg is a factory-method.
+
+>>> s = [('yellow', 1), ('blue', 2), ('yellow', 3), ('blue', 4), ('red', 1)]
+>>> d = defaultdict(list)
+>>> for k, v in s:
+...     d[k].append(v)
+...
+>>> d.items()
+[('blue', [2, 4]), ('red', [1]), ('yellow', [1, 3])]
+
+#arbitrary level of nested default-dicts!
+#Note the last leve will also be a default-dict, but this is okay and can be ignored - just handle keys
+tree = lambda: defaultdict(tree)
+my_holder = tree()
+
 List comprehesion
 ------------------
 
@@ -244,6 +262,10 @@ for i in range(1,10):
 
 break
 continue
+
+#limit for loop to a number
+for i in itertools.slice(iter,0,limit):
+    use(i)
 
 Want to iterate over 2(or more) lists of the same length simulataneously?
  -> Keep them as one list of tuples!
@@ -445,8 +467,10 @@ itertools.combinations(iterable, size_to_work)
 itertools.product(iterable, iterable)           -> (1,a), (1,b), (1,c), (2,a), (2,b), (2,c)
 itertools.groupby(iterable,keyfunc)             -> listof (keyvalue, sub-iterators) Note: given iterable Must be already sorted/sub-sorted.
 itertools.chain(it1,it2,..itn)                  -> single iterator that goes over all
-itertools.zip(it1,it2,..itn)                    -> single iterator that goes over tuples of members of all iterables. Stops at shorted.
-itertools.zip_longest(it1,it2,..itn)            -> ..zip till longes, filling None for thse that are over.
+itertools.zip(it1,it2,..itn)                    -> gets a list of tuples that goes over all iterables. Stops at shorted.
+itertools.zip_longest(it1,it2,..itn)            -> ..zip till longest, filling None for thse that are over.
+itertools.izip(it1,it2,..itn)                   -> single iterator(instead of a list) that goes over tuples of members of all iterables. Stops at shorted.
+itertools.izip_longest(it1,it2,..itn)           -> ..zip till longes, filling None for thse that are over.
 
 #infinte iterators
 itertools.cycle(iterable)                       -> keeps cycling on the iterable endlessly
@@ -647,6 +671,16 @@ pat_object = re.compile(pattern,flags)
 pat_object.search(haystack)
 pat_object.match(check_exact_match_input)
 
+character classes
+~~~~~~~~~~~~~~~~~~
+
+use r'...' to represet a regex for python to preserve the back-slashes
+
+\s   - space
+\S   - non-space
+()   - imply group. Use \( if u want to match a literal (
+
+
 os-package (file manipulation stuff)
 ----------
 
@@ -673,6 +707,12 @@ os.rename(src,dst)   # mv in python
 
 os.remove(path)  #delete a file
 shutil.rmtree(dir_with_contents)  # just delete a dir / folder with contents
+shutil.copyfile(src,dst)          # file copy / cp
+
+#if you just want contents copy
+def copycontents(src,dst):
+    with open(dst, 'wb') as output, open(src, 'rb') as input:
+        shutil.copyfileobj(input, output)
 
 # for quick and directy commands. Command o/p comes to stdout.
 os.system("your command with all args in a single string")
@@ -810,9 +850,14 @@ datetime.datetime.strftime('format')                    # print a time in a stri
 %H,%M,%S - 24-hr,min,sec as 0-padded-2-digit-numbers
 %a - 3 digit weekday
 
+%s - get seconds since epcoh #Undocumented. Might work or not.
+
 datetime.timedelta is returned when you subtract 2 datetime.datetime objects
 
 date = datetime_obj + datetime.timedelta(days=30)
+
+#to get time in seconds since epoch
+time.mktime(datetime.datetime.now().timetuple())
 
 Enums /enum
 -----
@@ -945,6 +990,22 @@ with daemon.DaemonContext():
     #whatever u want to daemonize
     main()
 
+Json
+----
+
+#read a string as json and creates a close python'ish object
+obj = json.loads(str)
+
+#put an arbitrary python object as string
+# Not all built-in python objects are convertible, but not user-defined objects
+str = json.dumps(obj)
+str = json.dumps(obj, indent=4, sort_keys=True)
+
+#for file
+json.dump(obj, fd)
+json.load(fd)
+
+
 
 Post a json object
 ------------------
@@ -954,6 +1015,26 @@ payload = {'some': 'data'}
 headers = {'content-type': 'application/json'}
 
 response = requests.post(url, data=json.dumps(payload), headers=headers)
+
+XML/xml
+----
+
+
+
+sha1
+----
+
+def sha1file(filename):
+    sha1=hashlib.sha1()
+    size=65536
+    with open(filename,'rb') as fd:
+        while True:
+            data=fd.read(size)
+            if not data:
+                break;
+            sha1.update(data)
+    return sha1.hexdigest()
+
 
 Find python version
 -------------------
@@ -1010,12 +1091,16 @@ reload a module in interpreter
 #import again / re import / reimport
 reload(module_name)
 
+#python3
+import importlib
+importlib.relaod(module_name)
+
 colorprint
 ----------
 
 color_dict = { 'Black':0, 'Red':1, 'Green':2, 'Yellow':3,  'Blue':4,    'Magenta':5, 'Cyan':6,    'White':7 }
 
-CSI='\033['
+CSI='\032['
 reset='\033[0m'
 
 normal_foreground=30
@@ -1025,6 +1110,13 @@ high_background=100
 
                           # foreground                        #background
 chosen_color_prefix = CSI + str(30+color_dict[color]) + ';' + str(40+color_dict[color]) + 'm'
+
+#in 256 color format
+
+#foreground
+chosen_color_prefix = CSI + '38;5;' + str(color_num) + 'm'
+#background
+chosen_color_prefix += CSI + '48;5;' + str(color_num) + 'm'
 
 from colorama import Fore, Back, Style
 
@@ -1082,3 +1174,49 @@ IP(import_hexcap())
 0x0020:  8010 0041 143f 0000 0101 080a 2a32 2ab5  ...A.?......*2*.
 0x0030:  1add 66e8                                ..f.
 ^D
+
+psutil
+------
+
+import psutil
+
+#collect all pros
+ps = [ p for p in psutil.process_iter() ]
+
+#collect  process with matching names
+name="zsh"
+ps = [ p for p in psutil.process_iter() if name in p.name() ]
+
+#collect process of user
+user="lakshman"
+ps = [ p for p in psutil.process_iter() if user in p.username() ]
+
+#collect uniq users
+users = { p.username() for p in psutil.process_iter() }
+
+#count ps per user
+d=collections.defaultdict(int)
+for p in psutil.process_iter() : d[p.username()] += 1
+
+
+Progress bar
+------------
+
+import tqdm
+
+# i dont get this fully on how it auto-computes len()
+# wrap it on any iterable.. how does it get len() ?
+for i in tqdm.tqdm(range(10000)):
+    pass
+
+#explicitly pass the total
+for i in tqdm.tqdm(myiter, total=10):
+
+#for a changing message before the bar.
+tqdm.setdescription("some string")
+
+
+ipython
+--------
+
+%rerun <num>
