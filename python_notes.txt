@@ -41,7 +41,7 @@ casting
 ~~~~~~~
 
 str(anything)       # for class-types, it invokes __repr__ of the class
-int(string_var)
+int(string_var,base=10)
 float(strint_var)   # yes. it coverts to double precision
 
 
@@ -181,16 +181,17 @@ a.lower()            # returns a new string that has all lower caps
 a.upper()
 a.count('f')         # counts no of substrings
 a.split(delimiter,times)   # splits a string based on delimiter. THe second is optional and gives number of times the slice should be done.
+                           # use re.split(regex, string) will give a list.
 
 a.encode('utf-8')    # gives a bytes object
 
 a.index()
 haystack.find(needle [,start [,end]])  # give index in haystack where needle is found, -1 on failure, start:end as in slicing
-a.replace()
+a.replace(old_substr, new_substr[, max]) # repl all/max occurences of old_substr with new_substr
 
 a.rfind()  # find from end.
 
-a.strip()            # trim whitespaces
+a.strip()            # trim whitespaces (for other chars use replace)
 a.rstrip()
 a.lstrip()
 a.replace(what_to_replace,to_replace_with,[,max])   #bbbbbb
@@ -198,12 +199,34 @@ a.replace(what_to_replace,to_replace_with,[,max])   #bbbbbb
 ord(a)    # gives the ordinal value of a, give just one char as input
 chr(num)  # inverse of ord
 
+a.startswith()  # boht accept single str or tuple of strings
+a.endswith()
+
 UnicodeEncodeError
 ~~~~~~~~~~~~~~~~~~
+
+
+Good video at : https://www.youtube.com/watch?v=sgHbC6udIqc
+
+# if you want to convert to ascii
 
 ascii_form = unicode_data.encode('ascii','ignore')
 ascii_form = unicode_data.encode('ascii','replace')  # you get '?' for every non-ascii
 ascii_form = unicode_data.encode('ascii','xmlcharrefreplace')  # you get &#<num>; for every non-ascii
+
+# if u want to retain unicode (while file writing)
+
+with open('file','w') as fd:
+    fd.write(unicode_string.encode('utf-8'))
+
+in python2,
+   str is actually a byte-string.
+   unicode is an array of unicode-points.
+    so we use .encode() .decode()
+    python2 automatically tries to decode/encode by def to ascii - so you get all those errors
+in python3,
+   str is an array of unicode-points
+   bytes is a array of bytes.
 
 
 bytes
@@ -231,6 +254,8 @@ collections.orderedDict
 SortedContainers.sortedDict
    -> A proper dict based on key.
    -> Looks like there is getNextAfterKey()/..Before.. [use bisect() and peekItem()]
+#python3 use
+sortedcontainers.SortedDict
 
 llist.dllist
   -> A doubly linked list in python. If you really wanted a linked list.
@@ -349,7 +374,8 @@ class Derived(Base):
 Magic attributes of a class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-n.__class__    # reference to a object of type class, which represents the class-definition
+n.__class__    # reference to a object of type class, which represents the class-definition.
+               #  this is how you do typeof() in python
 n.__doc__      # reference to the doc-string
 n.__repr__     # is a function, that will used to stringize the class.
                # Tip, it takes mandorty self, u can actaully pass more args
@@ -381,6 +407,11 @@ map
 Gives a generator, where the given fn is applied on the list provided.
 
 map (fn_to_apply, list_of_inputs)
+
+useful example:
+
+#convert a list of hex string into int numbers
+data = map(lambda x: int(x,16), data)
 
 Iterators
 ---------
@@ -634,6 +665,9 @@ also:
 group = parser.add_mutually_exclusive_group()
 group.add_argument("-v", "--verbose", action="store_true")
 group.add_argument("-q", "--quiet", action="store_true")
+
+#to explicitly print help
+parser.print_help()
 
 argc/argv example
 -----------------
@@ -909,7 +943,10 @@ requests.packages.urllib3.disable_warnings()
 requests
 --------
 
-r = requests.get('https://api.github.com/user', auth=('user', 'pass'))
+url='https://api.github.com/user'
+user='username'
+pass='password'
+r = requests.get(url, auth=(user, pass))
 
 dictvar = requests.utils.dict_from_cookiejar(cookiejar)
 cookies = requests.utils.cookiejar_from_dict(dictvar)
@@ -917,6 +954,7 @@ cookies = requests.utils.cookiejar_from_dict(dictvar)
 beautiful soup
 --------------
 
+(pip install beautifulsoup4)
 import bs4
 
 soup = bs4.BeautifulSoup(html_data,'html.parser')
@@ -929,8 +967,100 @@ print 'URL:',first_tag.get('href', None)
 print 'Contents:',first_tag.contents[0]
 print 'Attrs:',first_tag.attrs
 
+#pretty
+soup.prettify()
+
+4 types of objects
+
+Tag, NavigableString, BeautifulSoup, and Comment.
+
+XML/xml
+----
+
+Element:
+    * tag - name
+    * attribue - name/value paris
+    * context - text
+    * can have subelements to any depth
+    * xml can have only one root.
+
+import xml.etree.ElementTree as etree
+tree = etree.parse('file_having_xml.xml')
+root = tree.get_root()  # root if of type Element
+
+* element.tag is its tag
+* children are lists. This way element is an iterable
+* element.attrib is a dict
+* element.txt is its content
+
+import lxml.etree
+parser = lxml.etree.XMLParser(recover=True)
+mytree = etree.parse('pg_src', parser)
+parser.error_log
+
+all_a = mytree.findall("//{http://www.w3.org/1999/xhtml}a")
+for i in all_a:
+    if 'href' in i.attrib:
+        print i.attrib['href']
+
+lxml.etree.tostring(element)
+
+import xml.dom.minidom
+xml.dom.minidom.parseString(lxml.etree.tostring(mytree)).toprettyxml()
+
+Selenium
+--------
+
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+driver = webdriver.Chrome(chrome_options=chrome_options)
+driver.get(url)
+src=bs4.BeautifulSoup(driver.page_source,'lxml')
+with open('/tmp/a.html','w') as fd: fd.write(src.prettify())
+src=driver.find_element_by_class_name('searchBox')
+src
+src.clear()
+src.send_keys("123650")
+src.send_keys(Keys.RETURN)
+
+pg=driver.page_source
+souped=bs4.BeautifulSoup(driver.page_source,'lxml')
+with open('/tmp/a.html','w') as fd: fd.write(souped.prettify())
+
+elem=driver.
+l = driver.find_elements_by_class_name("gwt-TabLayoutPanelTab")
+for n,i in enumerate(l):
+    print('{} . {}'.format(n,i.text))
+elem=l[10]
+elem.click()
+pg=driver.page_source
+souped=bs4.BeautifulSoup(driver.page_source,'lxml')
+with open('/tmp/a.html','w') as fd: fd.write(souped.prettify())
+elem=driver.find_element_by_class_name('displayXML')
+elem.text
+
+
+
+Simple http server
+------------------
+
+* Dishes out files in its cwd too!
+
+#python2
+python -m SimpleHTTPServer 8080
+
+#python3
+python3 -m http.server 8080
+
+
+
 pickle
 -------
+
+# Just use json instad!
 
 pickle.dump(object_to_dump, write_file_handle)
 
@@ -1015,10 +1145,6 @@ payload = {'some': 'data'}
 headers = {'content-type': 'application/json'}
 
 response = requests.post(url, data=json.dumps(payload), headers=headers)
-
-XML/xml
-----
-
 
 
 sha1
@@ -1137,43 +1263,7 @@ Scapy
 
 http://www.secdev.org/projects/scapy/files/scapydoc.pdf
 
-import scapy.all
-
-#capture
-sniff(iface="nap301",filter="udp",prn=lambda x:x.summary(),count=10)
-
-#convert pkt to str
-str(pkt)
-
-#list of fields values to stdout. Returns None
-ls(pkt)
-
-#print hexdump on stdout. Returns None
-hexdump(pkt)
-
-pkt.summary()
-pkt.show()
-
-pkt[IP]
-pkt[IP].src
-pkt[IP].dst
-pkt[IP][UDP]
-pkt[IP][UDP].sport
-pkt[IP][UDP].payload
-
-
-#ping
-dip="10.10.1.1"
-a=IP(dst=dip)/ICMP(id=RandShort(),seq=RandShort())/Raw("Random String")
-reply=sr1(a)
-
-#get o/p of tcpdump -xX
-IP(import_hexcap())
-0x0000:  4500 0034 8ecc 4000 4006 cfb8 0a1e 6402  E..4..@.@.....d.
-0x0010:  0a1e 6401 0516 e811 afc4 2bb6 ba8d 2c21  ..d.......+...,!
-0x0020:  8010 0041 143f 0000 0101 080a 2a32 2ab5  ...A.?......*2*.
-0x0030:  1add 66e8                                ..f.
-^D
+# Look further in scapy.py file
 
 psutil
 ------
@@ -1198,6 +1288,38 @@ users = { p.username() for p in psutil.process_iter() }
 d=collections.defaultdict(int)
 for p in psutil.process_iter() : d[p.username()] += 1
 
+#if you have pid, get the process
+p = psutil.Process(pid)
+#and get anything of it (pid is field, everything else are functions())
+#   you get psutil.Error if pid no longer exists!
+p.pid
+p.ppid()
+p.name()
+p.cmdline()
+p.exe()
+p.terminal()
+p.cwd()
+
+
+
+Fuzzywuzzy
+---------
+
+import fuzzywuzzy
+
+#Get a match from a list
+choices=[....]
+list = fuzzywuzzy.process.extract(choices, 'mylookup')
+# you get a list of (string,ratio)
+better_results = [ i[0] for i in list if i[1] > 70 ]
+
+#get a ration
+a='string1'
+b='string2'
+ratio = fuzzywuzzy.fuzz.ratio(a,b)
+#ratio is 0.0 to 100.0
+
+
 
 Progress bar
 ------------
@@ -1220,3 +1342,25 @@ ipython
 --------
 
 %rerun <num>
+
+
+Virtual Env
+-----------
+
+mkdir path/to/a/parent_folder/hosting/virtual/envs
+cd path/to/a/parent_folder/hosting/virtual/envs
+virtualenv name_of_env
+#upon that you will see a new folder name_of_env here
+
+cd name_of_env/bin/
+
+# you can use this to step in
+source activate
+
+# in this bash, you can pip install anything
+# or run python here
+
+(or you can direclyt invoke the python from here to run)
+
+path/to/a/parent_folder/hosting/virtual/envs/name_of_env/bin/python <your script>
+
