@@ -260,6 +260,18 @@ sortedcontainers.SortedDict
 llist.dllist
   -> A doubly linked list in python. If you really wanted a linked list.
 
+General on sequence types
+-------------------------
+
+* list, tuple and collections.deque can hold items of different types.
+    * hold reference to items they contain
+* str, bytes, bytearray, memoryview and array.array hold items of one type.
+    * physically store the objects they contain
+
+Mutable:
+* list, bytearray, array.array, collections.deque, memoryview
+* tuple, str, bytes
+
 Import path
 -----------
 
@@ -617,6 +629,22 @@ variable=raw_input("Prompt string w/o newline:") # Gets whatever is given and as
 variable=input("Prompt string w/o newline:")     # Gets user-input and interprets it as a python-expression! Thus unquoted string-literals are interpreted as var-names
                                                  # Most likely not what you want. But if you type in a int, your variable also holds a int-object directly.
 
+# if you need from a choice:
+def askUser(choices=(1,2,3),max_attempts=5):
+    attempt = 0
+    while True:
+        try:
+            choice = int(raw_input("Do you want: \n(1) Bread \n(2) Butter \n(3) Jam \n:"))
+            if choice not in choices:
+                print("That is not a valid choice. your choices are %s"%choices)
+            else:
+                return choice
+        except ValueError:
+            print("Please input a number")
+        attempt += 1
+        if attempt >= max_attempts:
+            raise Exception
+
 Use readline library
 ~~~~~~~~~~~~~~~~~~~~
 import readline
@@ -783,6 +811,10 @@ os.listdir(given_dir)
 To filter only dirs:
 [ name for name in os.listdir(given_dir) if os.path.isdir(os.path.join(given_dir, name)) ]
 
+#using fnmatch to match glob expressions
+import fnmatch
+[ name for name in os.listdir(given_dir) if fnmatch.fnmatch(name, '*.txt') ]
+
 or
 
 #if you dont want to pass to stdin
@@ -882,7 +914,10 @@ datetime.datetime.strftime('format')                    # print a time in a stri
 %m - 0 padded 2 digit mth
 %Y - 4 digit year
 %H,%M,%S - 24-hr,min,sec as 0-padded-2-digit-numbers
-%a - 3 digit weekday
+%I - 12hr, %p - "AM"/"PM"
+%a - 3 alpha weekday
+%b - 3 alpha month
+%Z - time-zone
 
 %s - get seconds since epcoh #Undocumented. Might work or not.
 
@@ -892,6 +927,9 @@ date = datetime_obj + datetime.timedelta(days=30)
 
 #to get time in seconds since epoch
 time.mktime(datetime.datetime.now().timetuple())
+
+ eg: linux date o/p , and its string format
+     a=datetime.datetime.strptime("Mon Dec 11 20:08:01 UTC 2017","%a %b %d %H:%M:%S %Z %Y")
 
 Enums /enum
 -----
@@ -1095,6 +1133,10 @@ fh = logging.FileHandler('session.log')
 fh.setLevel(logging.DEBUG)
 sess_logger.add_handler(fh)
 sess_logger.debug("This is a session subsystem log")
+
+#using fnmatch to match glob expressions
+import fnmatch
+[ name for name in os.listdir(given_dir) if fnmatch.fnmatch(name, '*.txt') ]
 
 * Note: logging defers calling the arg's __str__ function. Do
 
@@ -1363,4 +1405,16 @@ source activate
 (or you can direclyt invoke the python from here to run)
 
 path/to/a/parent_folder/hosting/virtual/envs/name_of_env/bin/python <your script>
+
+pdb
+----
+
+just do
+
+import pdb
+
+#This will break where you want
+# you get a prompt
+# and study variables here
+pdb.trace()
 
