@@ -1,5 +1,4 @@
-Functions
------------
+# Functions
 
 * start with def
 * no return type - either what return statement returns or None. (not last statement stuff)
@@ -9,44 +8,44 @@ Functions
 
 eg:
 
+```python
 def add(a,b):
   c=a+b
   return c
 
 add(5,10)
+```
 
-
-Commenting comments
--------------------
+# comments
 
 * '''...''' right after the function defintion
 * function.__doc__ is the way to get the doc-string of a function
 * Simple comments begin with #
 
-Data-types
-===========
+# Data-types
 
-booleans
-numbers
-strings
-bytes and bytearray
-lists
-tuples
-sets
-dictionaries
+* booleans
+* numbers
+* strings
+* bytes and bytearray
+* lists
+* tuples
+* sets
+* dictionaries
+
+Working with data-types
 
 * use type(variable) to check the type of a variable.
 
-casting
-~~~~~~~
+## casting
 
+```python
 str(anything)       # for class-types, it invokes __repr__ of the class
 int(string_var,base=10)
 float(strint_var)   # yes. it coverts to double precision
+```
 
-
-List
-----
+## List
 
 * list is [ .. ] separated by comma
 * list elements are indexed from 0 and name[0] is the way to get one element
@@ -58,69 +57,92 @@ List
 * l[size:] -> will give u from size'th index (i.e size+1th element) till end
 * lists never have gaps
 
-len(a)
-a.append(one_value)
-a.extend([list])
-a.insert(index,value)  # Use this for inserting at head/index-0 !
-del a[index]   # list size reduced by one. and all indices index+1:<end> .. become index:<end>
-a.pop()  # pops the last index, gets a IndexError when we pop a empty list. List reduces after pop.
-a.pop(index)  # pops given index
-a.remove(value)  # pops vlaue. raises ValueError if value is not found
-a.index(value)  # gives index of the value.
-sorted(a)   # Gives a new list which is sorted a.
-str.join(list_x)  # joins each element in list_x with str as the joining character .. eg: ' '.join(['hello','world'])
+operations on lists:
 
-#LIFO (stack) -> append/pop() is equialent of push/pop
-#FIFO (queue) -> append/pop(0) is equialent of insert_tail/pop_head
-                 insert(0,val)/pop() is equialent of insert_head/pop_tail
+* `len(a)`
+* `a.append(one_value)`
+* `a.extend([list])`
+* `a.insert(index,value)` # Use this for inserting at head/index-0 !
+* `del a[index]`          # list size reduced by one. and all indices `index+1:<end>` become `index:<end>`
+* `a.pop()`               # pops the last index, gets a IndexError when we pop a empty list. List reduces after pop.
+* `a.pop(index)`          # pops given index
+* `a.remove(value)`       # pops vlaue. raises ValueError if value is not found
+* `a.index(value)`        # gives index of the value.
+* `sorted(a)`             # Gives a new list which is sorted a.
+* `str.join(list_x)`      # joins each element in list_x with str as the joining character. eg: `' '.join(['hello','world'])`
 
+To use list as:
 
-value in a # boolean expression to check if value is in a list. WORKS FOR STRING AS WELL
+* LIFO (stack)
+    * append/pop() is equialent of push/pop
+* FIFO (queue)
+    * append/pop(0) is equialent of insert_tail/pop_head
+    * insert(0,val)/pop() is equialent of insert_head/pop_tail
 
+Quickly check if a value is in list:
+
+```python
+elem in lst # WORKS FOR STRING AS WELL
+```
+Iterate in list
+
+```python
 for value in a:
   # .. use value
+```
 
-+ operator concatenates lists
+* `+` operator concatenates lists
 
-list.sort()  -> sorts the list in place. So better than sorted(list) if u dont need orig-list.
-             -> sorted() takes any iterable, but list.sort() is available only for lists.
-Both sorted and list.sort() take a named key arg. This is a function with one-arg and returns
-         a value, which is used as the value to be sorted. (Efficient as this func is called
-         only once for each member). Lambda's are typically used here..
+Sorting a list
+* list.sort()
+    * sorts the list in place. So better than sorted(list) if u dont need orig-list.
+    * sorted() takes any iterable, but list.sort() is available only for lists.
+* Both sorted and list.sort() take a named key arg. This is a function with one-arg and returns
+  a value, which is used as the value to be sorted. (Efficient as this func is called
+  only once for each member). Lambda's are typically used here..
+
+### List comprehesion
+
+```python
+[ expression-having-variable for variable in origList ]
+[ expression-having-variable for variable in origList if condition ]
+```
+
+* so is it with dictionary and set comprehesion
+
+```python
+{ expression_with_i:another_expression_with_i for i in a_list if condition }
+```
 
 
+## Tuples
 
-Tuples
------
-
-* Use ( , .. , ) for types instead of squarebracket.
+* Use `( , .. , )` for types instead of squarebracket.
 * (tuple1) = (tuple2)
-    eg: (x,y,z) = (1,2,3) is a conveneient way to assign multiple variables respectively
+    * eg: (x,y,z) = (1,2,3) is a conveneient way to assign multiple variables respectively
 
+## Sets
 
-Sets
------
-
-* Use { , .. , } for sets
+* Use `{ , .. , }` for sets
 * sets dont remember order of their elements
 * values in the sets are unique.
 
-a.add(value)  # adds a value to set if its not already present.
-a.update(value, set, list) # addes the value, members of set, list to the set.
-a.discard(value)  # removes the value from set. No error if value not present
-a.remove(value)  # removes the value from set. KeyError is raised if value not present.
-a.pop()          # removes some arbitrary member from set. KeyError on empty set
-a.clear()         # clears the set. same as a=set()
+Operations on set:
 
-a.union(b)  # returns a *new* set that is union of a & b
-a.intersection(b)
-a.difference(b)             # in a not in b
-a.symmetric_difference(b)   # in strictly only of a and b
+`a.add(value)`               # adds a value to set if its not already present.
+`a.update(value, set, list)` # addes the value, members of set, list to the set.
+`a.discard(value)`           # removes the value from set. No error if value not present
+`a.remove(value)`            # removes the value from set. KeyError is raised if value not present.
+`a.pop()`                    # removes some arbitrary member from set. KeyError on empty set
+`a.clear()`                  # clears the set. same as a=set()
+`a.union(b)`                 # returns a *new* set that is union of a & b
+`a.intersection(b)`
+`a.difference(b)`            # in a not in b
+`a.symmetric_difference(b)`  # in strictly only of a and b
 
 Note: a= {} creates a empty *dictionary*, not set.
 
-Dictionary
-------------
+## Dictionary
 
 * user { key:value } for dictionary
 
@@ -132,19 +154,21 @@ a.items()   # gives a list of tuple of (key, value) from a dictionary
 
 a.pop(key [, default])   # dels the key and returns its value. If key isn't present default is given. If default isn't supplied KeyError is generated
 
-#when iterating over dict, u typically iterate over keys
+```python
+# when iterating over dict, u typically iterate over keys
 for key in a_dict:
 
 # if u need boht key and value, then use iteritems
 for key,value in a_dict.iteritems()
 
 orig_dict.update(another_dict)
+```
 
-handy defaulting
-~~~~~~~~~~~~~~~~
+### Use collections.defaultdict for handy defaulting
 
-#first arg is a factory-method.
+* first arg is a factory-method.
 
+```python
 >>> s = [('yellow', 1), ('blue', 2), ('yellow', 3), ('blue', 4), ('red', 1)]
 >>> d = defaultdict(list)
 >>> for k, v in s:
@@ -157,20 +181,9 @@ handy defaulting
 #Note the last leve will also be a default-dict, but this is okay and can be ignored - just handle keys
 tree = lambda: defaultdict(tree)
 my_holder = tree()
+```
 
-List comprehesion
-------------------
-
-[ expression-having-variable for variable in origList ]
-[ expression-having-variable for variable in origList if condition ]
-
-so is it with dictionary and set comprehesion
-
-{ expression_with_i:another_expression_with_i for i in a_list if condition }
-
-
-strings
----------
+## strings
 
 * Every string is a UTF-8 encoded sequence of characters in python-3.
 * strings can be single or double-quoted(abs no diff. This helps to avoid escaping either). Triple single quotes is for long strings. r'raw \.string' is a raw strings
@@ -202,20 +215,20 @@ chr(num)  # inverse of ord
 a.startswith()  # boht accept single str or tuple of strings
 a.endswith()
 
-UnicodeEncodeError
-~~~~~~~~~~~~~~~~~~
+### UnicodeEncodeError
 
 
 Good video at : https://www.youtube.com/watch?v=sgHbC6udIqc
 
-# if you want to convert to ascii
+* if you want to convert to ascii
 
 ascii_form = unicode_data.encode('ascii','ignore')
 ascii_form = unicode_data.encode('ascii','replace')  # you get '?' for every non-ascii
 ascii_form = unicode_data.encode('ascii','xmlcharrefreplace')  # you get &#<num>; for every non-ascii
 
-# if u want to retain unicode (while file writing)
+* if u want to retain unicode (while file writing)
 
+```python
 with open('file','w') as fd:
     fd.write(unicode_string.encode('utf-8'))
 
@@ -227,10 +240,10 @@ in python2,
 in python3,
    str is an array of unicode-points
    bytes is a array of bytes.
+```
 
 
-bytes
------
+## bytes
 
 defined as b'\xfe' or b'abc'
 
@@ -241,8 +254,7 @@ a.decode('ascii')    # gives a string object.
 bytes like string is immutable
 bytearray is mutuable
 
-Extra ones.
-----------
+# Extra ones.
 
 collections.deque
    -> like list, but has front and back at O(1)
