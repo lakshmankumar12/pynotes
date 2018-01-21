@@ -279,12 +279,6 @@ Mutable:
 * list, bytearray, array.array, collections.deque, memoryview
 * tuple, str, bytes
 
-# General Tips on Python
-
-## Import path
-
-sys.path is the list of locations looked fork
-
 # control structures
 
 ```python
@@ -539,8 +533,67 @@ itertools.cycle(iterable)                       -> keeps cycling on the iterable
 reversed(iterable)                              -> native way to reverse any interable
 ```
 
+# Python Internals
+
+Every name you see is a reference/pointer to an object.
+The underlying object is either an immutable object or a mutable object.
+
+## Import path
+
+sys.path is the list of locations looked for imported modules
+
+## Python library mgmt
+
+Typically python stores all its libraries in
+
+/usr/local/lib/python<ver>/site-packages
+/usr/local/python<ver>/dist-packages
+
+sudo apt-get install python-pip
+
+and then
+
+```sh
+pip install <blah-blah>
+```
+
+or if u get the source
+
+```sh
+cd the-new-stuff
+python ./setup.py install   # use the right python-version to install in its location
+
+#List all installed libraries.
+pip freeze
+
+#list all files installed in a package
+pip show -f <package>
+```
+
+## Python Interpreter notes
+
+Use underscore to capture last value
+
+```python
+>>> 5 + 6
+>>> a = _
+```
+
+### reload a module in interpreter
+
+```python
+#import again / re import / reimport
+reload(module_name)
+
+#python3
+import importlib
+importlib.relaod(module_name)
+```
+
+
 # Simple commands
 
+```python
 print()   # also prints a "\n" at end of string
 
 print "happy arg:%d"%arg,  # the trailing comman skips the newline
@@ -549,66 +602,78 @@ print('.',end="",flush=True)   # to control "\n" and flushing  .. only in python
 sys.stdout.flush()  # in python 2
 
 print('string',file=sys.stdout)  # to a file
+```
+
+## formating
 
 https://pyformat.info/
 
+```python
 string.format(args)
 '{0} {1:2d}'.format(s,i)
 '{0:b}'.format(i)               # is a quick way to print a number in binary
+```
 
-By default format calls __format__ of the object.
-Use !r !s or !a to call __repr__, __str__, ascii()
-{0!r:}
+* By default format calls __format__ of the object.
+* Use !r !s or !a to call __repr__, __str__, ascii()
+* {0!r:}
+* align right/left/center : `> , -, ^`
 
-align right/left/center : > , -, ^
-
+```python
 {<arg-position><convertion-flag>:<padding-char><align><width>.<trunc-width><type>}  # default type is string
+```
 
-older python:
+## print function for v2
 
+```python
 # use this and use print statement.
 from __future__ import print_function
 
 print "format string %d, %s, %s"%(int_var,str_var,"string literal")
+```
 
 
-Error handling/Exception
---------------
+## Error handling/Exception
 
+```python
 try:
 
 except IOError:
+```
 
-# Note its except and not expect
-
+* Note its except and not expect
 * No one defines what exceptions will be raised. We handle every possible exception
 * keyword to throw in python is raise
 
+```python
 def function():
   ...;
   if problem:
     raise IOError;
   ...;
+```
 
 
 Various ways to catch exceptions:
 
+```python
 except IOError as e:
   e.whatever..
   e.errno
   e.strerror
+```
 
 Capture all Exceptions!
 
+```python
 except Exception,e:
   print str(e)
+```
+
+## Reading file line by line:
 
 
-
-Reading file line by line:
---------------------------
-
-
+```python
 with open("file","r") as fp:
   for i in fp:                  # This is efficient on large files. so *ok for big files*
     print(i)
@@ -629,17 +694,19 @@ for line in sys.stdin:
   print line
 
 for line_number, line in enumerate(fd):   # will also get line-number along
+```
 
 enumerate(iterable,start_value=0)         # will start value from start_value
 
-To find if a variable is a list/scalar
+## To find if a variable is a list/scalar
 
+```python
 if isinstance(var_name, list):
+```
 
+## User input (from stdin, keyboard)
 
-User input (from stdin, keyboard)
-----------
-
+```python
 #what you probably need most of the time
 variable=raw_input("Prompt string w/o newline:") # Gets whatever is given and assigns to variable which is now a str. You then cast this string into whatever you want.
 
@@ -662,9 +729,11 @@ def askUser(choices=(1,2,3),max_attempts=5):
         attempt += 1
         if attempt >= max_attempts:
             raise Exception
+```
 
-Use readline library
-~~~~~~~~~~~~~~~~~~~~
+### Use readline library
+
+```python
 import readline
 import atexit
 
@@ -685,10 +754,24 @@ if os.path.exists(historyPath):
     readline.read_history_file(historyPath)
 
 atexit.register(save_history)
+```
 
-Arg parse
---------
+## Find python version
 
+python -v
+
+## To make a script run if its main
+
+```python
+if __name__ == "__main__":
+```
+
+
+# Various Python Libraries
+
+## Arg parse
+
+```python
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-v","--verbose", help="increase output verbosity", action="store_true")       # captures if --verbosity present or not in arg-list. No arg per-se for this option.
@@ -714,24 +797,25 @@ group.add_argument("-q", "--quiet", action="store_true")
 
 #to explicitly print help
 parser.print_help()
+```
 
-argc/argv example
------------------
+### argc/argv example
 
+```python
 if len(sys.argv) < 2:
     sys.exit('Usage: %s database-name' % sys.argv[0])
 
 if not os.path.exists(sys.argv[1]):
     sys.exit('ERROR: Database %s was not found!' % sys.argv[1])
+```
 
-exiting from python
----------------------
+## exiting from python
 
 sys.exit(0)
 
-regular expression  regexp regex
-------------------
+## regular expression  regexp regex
 
+```python
 import re
 m =  re.search (pat, haystack)   # m is a match object or a None
 
@@ -750,9 +834,9 @@ valid_filename = re.sub(r'[\\/:"*?<>|]+', "_", var_having_junk_chars)
 pat_object = re.compile(pattern,flags)
 pat_object.search(haystack)
 pat_object.match(check_exact_match_input)
+```
 
-character classes
-~~~~~~~~~~~~~~~~~~
+### character classes
 
 use r'...' to represet a regex for python to preserve the back-slashes
 
@@ -761,9 +845,9 @@ use r'...' to represet a regex for python to preserve the back-slashes
 ()   - imply group. Use \( if u want to match a literal (
 
 
-os-package (file manipulation stuff)
-----------
+## os-package (file manipulation stuff)
 
+```python
 os.path.join(dir,filename)
 (dirname,filename) = os.path.split("abc/efg/file")       # dirname basename
 (filename,extension) = os.path.splitext("filename.ext")  # note the spelling split-ext
@@ -805,10 +889,11 @@ boolean_variable=os.access("/path/to/file",os.F_OK)  # does file exist at all
 boolean_variable=os.access("/path/to/file",os.R_OK)
 boolean_variable=os.access("/path/to/file",os.W_OK)
 boolean_variable=os.access("/path/to/file",os.X_OK)
+```
 
-To recursively walk a dir
-~~~~~~~~~~~~~~~~~~~~~~~~~
+### To recursively walk a dir
 
+```python
 # os.walk gives a generator that recurses into dirs.
 # So our code looks nice and iterative!
 for subdir, dirs, files in os.walk(a_given_dir):
@@ -820,13 +905,14 @@ for subdir, dirs, files in os.walk(a_given_dir):
   for f in dirs:
     fname = os.path.join(subdir, f)
     print(fname)
+```
 
-To just list one level
-~~~~~~~~~~~~~~~~~~~~~~
+* To just list one level
 
+```python
 os.listdir(given_dir)
 
-To filter only dirs:
+#To filter only dirs:
 [ name for name in os.listdir(given_dir) if os.path.isdir(os.path.join(given_dir, name)) ]
 
 #using fnmatch to match glob expressions
@@ -883,30 +969,33 @@ list_of_filenames=glob.glob("*.py")
 
 import sh
 a=sh.ls('-1','.')
+```
 
-File locking
--------------
+### File locking
 
 
+```python
 import fcntl
 x = open('foo', 'w+')
 fcntl.flock(x, fcntl.LOCK_EX | fcntl.LOCK_NB)
 Unlocking is just as easy:
 
 fcntl.flock(x, fcntl.LOCK_UN)
+```
 
-random
--------
+## random
 
+```python
 random.seed([x])    # x is any hashanble object. if none is passed, sys-time is used.
 random.shuffle(x)   # shuffles list x in place.
 random.randint(a,b) # get a random int from [a,b], both included
 random.sample(iterable,k=1)  # gets a k-sized tuple of items from iterable.
+```
 
 
-time
-----
+## time
 
+```python
 >>> import time
 >>> st_mtime=1247520344.9537716
 >>> time.localtime(st_mtime)
@@ -916,10 +1005,11 @@ time.struct_time(tm_year=2009, tm_mon=7, tm_mday=13, tm_hour=14, tm_min=25, tm_s
 #sleeping in python
 from time import sleep
 sleep(0.1) # Time in seconds.
+```
 
-datetime
----------
+### datetime
 
+```python
 #Note: datetime module has 2 objects - date  and datetime. (And a timedelta)
 
 datetime.date.today()
@@ -948,10 +1038,11 @@ time.mktime(datetime.datetime.now().timetuple())
 
  eg: linux date o/p , and its string format
      a=datetime.datetime.strptime("Mon Dec 11 20:08:01 UTC 2017","%a %b %d %H:%M:%S %Z %Y")
+```
 
-Enums /enum
------
+## Enums /enum
 
+```python
 from enum import Enum
 
 class Color(Enum):
@@ -971,11 +1062,12 @@ Color(1)
 
 #if u have string, to get enum object
 Color['Red']
+```
 
 
-urllib
-------
+## urllib
 
+```python
 import urllib
 
 uf = urllib.urlopen('http://google.com')
@@ -989,16 +1081,11 @@ request = urllib2.Request("http://api.foursquare.com/v1/user")
 base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
 request.add_header("Authorization", "Basic %s" % base64string)
 result = urllib2.urlopen(request)
+```
 
-To supress warnings
-^^^^^^^^^^^^^^^^^^^
+## requests
 
-import requests.packages.urllib3
-requests.packages.urllib3.disable_warnings()
-
-requests
---------
-
+```python
 url='https://api.github.com/user'
 user='username'
 pass='password'
@@ -1006,11 +1093,19 @@ r = requests.get(url, auth=(user, pass))
 
 dictvar = requests.utils.dict_from_cookiejar(cookiejar)
 cookies = requests.utils.cookiejar_from_dict(dictvar)
+```
 
-beautiful soup
---------------
+### To supress warnings
 
-(pip install beautifulsoup4)
+```python
+import requests.packages.urllib3
+requests.packages.urllib3.disable_warnings()
+```
+
+## beautiful soup
+
+```python
+#pip install beautifulsoup4
 import bs4
 
 soup = bs4.BeautifulSoup(html_data,'html.parser')
@@ -1025,13 +1120,13 @@ print 'Attrs:',first_tag.attrs
 
 #pretty
 soup.prettify()
+```
 
 4 types of objects
 
 Tag, NavigableString, BeautifulSoup, and Comment.
 
-XML/xml
-----
+## XML/xml
 
 Element:
     * tag - name
@@ -1040,15 +1135,18 @@ Element:
     * can have subelements to any depth
     * xml can have only one root.
 
+```python
 import xml.etree.ElementTree as etree
 tree = etree.parse('file_having_xml.xml')
 root = tree.get_root()  # root if of type Element
+```
 
 * element.tag is its tag
 * children are lists. This way element is an iterable
 * element.attrib is a dict
 * element.txt is its content
 
+```python
 import lxml.etree
 parser = lxml.etree.XMLParser(recover=True)
 mytree = etree.parse('pg_src', parser)
@@ -1063,10 +1161,11 @@ lxml.etree.tostring(element)
 
 import xml.dom.minidom
 xml.dom.minidom.parseString(lxml.etree.tostring(mytree)).toprettyxml()
+```
 
-Selenium
---------
+## Selenium
 
+```python
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
@@ -1097,34 +1196,33 @@ souped=bs4.BeautifulSoup(driver.page_source,'lxml')
 with open('/tmp/a.html','w') as fd: fd.write(souped.prettify())
 elem=driver.find_element_by_class_name('displayXML')
 elem.text
+```
 
-
-
-Simple http server
-------------------
+## Simple http server
 
 * Dishes out files in its cwd too!
 
+```python
 #python2
 python -m SimpleHTTPServer 8080
 
 #python3
 python3 -m http.server 8080
+```
 
+## pickle
 
+* Just use json instad!
 
-pickle
--------
-
-# Just use json instad!
-
+```python
 pickle.dump(object_to_dump, write_file_handle)
 
 ob = picke.load(read_file_handle)
+```
 
-pexpect
---------
+## pexpect
 
+```python
 child=pexpect.spawn("cmd",["arg1","arg2"])
 try:
   result=child.pexpect(["regex1","regex2"], timeout=120)
@@ -1133,11 +1231,12 @@ try:
 except pexpect.EOF:
   #pass
 except pexpect.TIMEOUT:
+```
 
 
-logging
---------
+## logging
 
+```python
 import logging
 logging.basicConfig(filename="abc.log", level=logging.DEBUG)
 # mode='w', will erase existing log file
@@ -1155,34 +1254,37 @@ sess_logger.debug("This is a session subsystem log")
 #using fnmatch to match glob expressions
 import fnmatch
 [ name for name in os.listdir(given_dir) if fnmatch.fnmatch(name, '*.txt') ]
+```
 
 * Note: logging defers calling the arg's __str__ function. Do
 
 logging.debug("This is fmt - %s and %s", some_object1, some_object2)
 The actual invocation of some_object1.__str__() doesn't happen if debug level is diabled.
 
-Context-manager
----------------
+## Context-manager
 
+```python
 @contextmanager
 def change_dir_to(new_dir):
   current_dir = os.getcwd()
   os.chdir(new_dir)
   yield
   os.chdir(current_dir)
+```
 
-Daemonizing
-----------
+## Daemonizing
 
+```python
 import daemon
 
 with daemon.DaemonContext():
     #whatever u want to daemonize
     main()
+```
 
-Json
-----
+## Json
 
+```python
 #read a string as json and creates a close python'ish object
 obj = json.loads(str)
 
@@ -1194,22 +1296,22 @@ str = json.dumps(obj, indent=4, sort_keys=True)
 #for file
 json.dump(obj, fd)
 json.load(fd)
+```
 
+### Post a json object
 
-
-Post a json object
-------------------
-
+```python
 url = 'https://api.github.com/some/endpoint'
 payload = {'some': 'data'}
 headers = {'content-type': 'application/json'}
 
 response = requests.post(url, data=json.dumps(payload), headers=headers)
+```
 
 
-sha1
-----
+## sha1
 
+```python
 def sha1file(filename):
     sha1=hashlib.sha1()
     size=65536
@@ -1220,70 +1322,19 @@ def sha1file(filename):
                 break;
             sha1.update(data)
     return sha1.hexdigest()
+```
 
 
-Find python version
--------------------
-
-python -v
-
-To make a script run if its main
---------------------------------
-
-if __name__ == "__main__":
-
-Curses
-------
+## Curses
 
 * window - is an internal representation containing an image of a part of the screen.
 * screen - is a window with the size of the entire screen (from the upper left to the lower right)
 * WINDOW stdscr - standard screen
 
 
-Python Internals
----------------
+## colorprint
 
-Every name you see is a reference/pointer to an object.
-The underlying object is either an immutable object or a mutable object.
-
-Python library mgmt
---------------------
-
-Typically python stores all its libraries in
-
-/usr/local/lib/python<ver>/site-packages
-/usr/local/python<ver>/dist-packages
-
-sudo apt-get install python-pip
-
-and then
-
-pip install <blah-blah>
-
-or if u get the source
-
-cd the-new-stuff
-python ./setup.py install   # use the right python-version to install in its location
-
-#List all installed libraries.
-pip freeze
-
-#list all files installed in a package
-pip show -f <package>
-
-reload a module in interpreter
-------------------------------
-
-#import again / re import / reimport
-reload(module_name)
-
-#python3
-import importlib
-importlib.relaod(module_name)
-
-colorprint
-----------
-
+```python
 color_dict = { 'Black':0, 'Red':1, 'Green':2, 'Yellow':3,  'Blue':4,    'Magenta':5, 'Cyan':6,    'White':7 }
 
 CSI='\033['
@@ -1316,18 +1367,17 @@ print('back to normal now')
 Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
 Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
 Style: DIM, NORMAL, BRIGHT, RESET_ALL
+```
 
-
-Scapy
-------
+## Scapy
 
 http://www.secdev.org/projects/scapy/files/scapydoc.pdf
 
-# Look further in scapy.py file
+* Look further in scapy.py file
 
-psutil
-------
+## psutil
 
+```python
 import psutil
 
 #collect all pros
@@ -1359,12 +1409,11 @@ p.cmdline()
 p.exe()
 p.terminal()
 p.cwd()
+```
 
+## Fuzzywuzzy
 
-
-Fuzzywuzzy
----------
-
+```python
 import fuzzywuzzy
 
 #Get a match from a list
@@ -1378,12 +1427,11 @@ a='string1'
 b='string2'
 ratio = fuzzywuzzy.fuzz.ratio(a,b)
 #ratio is 0.0 to 100.0
+```
 
+## Progress bar
 
-
-Progress bar
-------------
-
+```python
 import tqdm
 
 # i dont get this fully on how it auto-computes len()
@@ -1396,17 +1444,17 @@ for i in tqdm.tqdm(myiter, total=10):
 
 #for a changing message before the bar.
 tqdm.setdescription("some string")
+```
 
 
-ipython
---------
+## ipython
 
 %rerun <num>
 
 
-Virtual Env
------------
+## Virtual Env
 
+```sh
 mkdir path/to/a/parent_folder/hosting/virtual/envs
 cd path/to/a/parent_folder/hosting/virtual/envs
 virtualenv name_of_env
@@ -1423,27 +1471,19 @@ source activate
 (or you can direclyt invoke the python from here to run)
 
 path/to/a/parent_folder/hosting/virtual/envs/name_of_env/bin/python <your script>
-
-Python Interpreter notes
-------------------------
-
-Use underscore to capture last value
-
-```python
->>> 5 + 6
->>> a = _
 ```
 
 
-pdb
-----
+## pdb
 
 just do
 
+```python
 import pdb
 
 #This will break where you want
 # you get a prompt
 # and study variables here
 pdb.trace()
+```
 
