@@ -254,26 +254,21 @@ a.decode('ascii')    # gives a string object.
 bytes like string is immutable
 bytearray is mutuable
 
-# Extra ones.
+## Extra Extended Datatypes from Collections
 
-collections.deque
-   -> like list, but has front and back at O(1)
+* collections.deque
+   * like list, but has front and back at O(1)
+* collections.orderedDict
+   * A bit useless. Order is maintained on insertion order of keys.
+   * This is more standard than the SortedContainers below. So use this if it solves the purpose
+* SortedContainers.sortedDict
+   * A proper dict based on key.
+   * Looks like there is getNextAfterKey()/..Before.. [use bisect() and peekItem()]
+   * python3 use - sortedcontainers.SortedDict
+* llist.dllist
+   * A doubly linked list in python. If you really wanted a linked list.
 
-collections.orderedDict
-   -> A bit useless. Order is maintained on insertion order of keys.
-   -> This is more standard than the SortedContainers below. So use this if it solves the purpose
-
-SortedContainers.sortedDict
-   -> A proper dict based on key.
-   -> Looks like there is getNextAfterKey()/..Before.. [use bisect() and peekItem()]
-#python3 use
-sortedcontainers.SortedDict
-
-llist.dllist
-  -> A doubly linked list in python. If you really wanted a linked list.
-
-General on sequence types
--------------------------
+## General Summary on sequence types
 
 * list, tuple and collections.deque can hold items of different types.
     * hold reference to items they contain
@@ -284,14 +279,15 @@ Mutable:
 * list, bytearray, array.array, collections.deque, memoryview
 * tuple, str, bytes
 
-Import path
------------
+# General Tips on Python
+
+## Import path
 
 sys.path is the list of locations looked fork
 
-control structures
-------------------
+# control structures
 
+```python
 if condition:
   ...
 elif next_condition:         #python's else if style
@@ -315,50 +311,53 @@ continue
 #limit for loop to a number
 for i in itertools.slice(iter,0,limit):
     use(i)
+```
 
-Want to iterate over 2(or more) lists of the same length simulataneously?
- -> Keep them as one list of tuples!
-eg:
-student=['s1','s2','s3']
-mentor=['m1',m2','m3]
-count = 0
-for s in student:
-  print s,m[0]
+* Want to iterate over 2(or more) lists of the same length simulataneously?
+  *  Keep them as one list of tuples!
+    ```python
+    student=['s1','s2','s3']
+    mentor=['m1',m2','m3]
+    count = 0
+    for s in student:
+      print s,m[0]
 
-can instead be:
+    can instead be:
 
-student_mentors=[('s1','m1'),('s2','m2'),('s3','m3')]
-for (s,m) in student_mentors:
-  print s,m
+    student_mentors=[('s1','m1'),('s2','m2'),('s3','m3')]
+    for (s,m) in student_mentors:
+      print s,m
+    ```
 
 
-
-logical operators
------------------
+## logical operators
 
 and
 or
 not
 
 
-variable args to function
--------------------------
+## variable args to function
 
+```python
 def manyArgs(arg1, arg2, *args, **kwargs):
   #arg1, arg2 are std args
   #args is a tuple of all unnamed args
   #kwargs is a dict of all named args
+```
 
+## swap 2 variables
 
-swap 2 variables
-----------------
-
+```python
 a,b = b,a
+```
+
+# More pythonic constructs
 
 
-class
------
+## class
 
+```python
 class Name:
   #There is no explicity declaring of members
 
@@ -377,27 +376,30 @@ class Name:
     pass                        # note the absence of self for static member functions. Invoked as ClassName.function()
     Name.count++;               #refering a Name.member brings in a c++-style static member of the class.
 
-
 #Later..
 n = Name(10,12)
+```
 
 * The attributes of a class are kind of public. No data-encapsulation.
 * In fact, attributes of a class can be added at will anytime. There is really no
   fixed-set of attributes for a class
   n.newAttribute = "abc"   # is perfectly valid anywhere!
-* ClassName.var_name  # when used with ClassName refers to a var_name in class-scope(static like)
-                      # DONT FORGET the ClassName - otherwise, it just uses/refers to a local var.
+* ClassName.var_name 
+    * when used with ClassName refers to a var_name in class-scope(static like)
+    * DONT FORGET the ClassName - otherwise, it just uses/refers to a local var.
 * methods in the class can work on static members as long as they use ClassName to scope it.
 * But instance_var.var_name  # when assigned to, will create a instance level attribute!
 
+```python
 class Derived(Base):
   def __init__(self, derived_args):
     Base.__init__(self, base_args)
     self.derived_member = derived_args
+```
 
-Magic attributes of a class
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### Magic attributes of a class
 
+```python
 n.__class__    # reference to a object of type class, which represents the class-definition.
                #  this is how you do typeof() in python
 n.__doc__      # reference to the doc-string
@@ -407,10 +409,11 @@ n.__repr__     # is a function, that will used to stringize the class.
 
 hasattr(object, "member")  # check if object.member exists
 setattr(object, "member", "value")
+```
 
-Global scope
-------------
+## Global scope
 
+```python
 var  = 5;     #global scope - outside of any function
 
 def func():
@@ -419,34 +422,37 @@ def func():
 
 def func2()
   var = 6        #silently creates a local var and uses that. Doesn't reflect glboal var.
+```
 
-lambda
--------
+## lambda
 
+```python
 lambda arg1 [, arg2,..]: manipulate(args)
+```
 
-map
----
+## map
 
 Gives a generator, where the given fn is applied on the list provided.
 
+```python
 map (fn_to_apply, list_of_inputs)
+```
 
 useful example:
 
+```python
 #convert a list of hex string into int numbers
 data = map(lambda x: int(x,16), data)
+```
 
-Iterators
----------
+## Iterators
 
 * A class that implements __iter__ , which returns a object that implements __next__
 * Typically its customary to return self in __iter__ and implemen __next__
 * User calls next() and gets StopIteration error at end.
 
 
-Generator
----------
+## Generator
 
 * Is a function (defined with def Name():)
 * But has a yield statement in it.
@@ -459,7 +465,7 @@ Generator
   the def block remember their values
 * When code falls off the def-block, we get StopIteration thrown to the next() caller.
 
-----
+```python
 # a generator that yields items instead of returning a list
 def firstn(n):
     num = 0
@@ -468,18 +474,16 @@ def firstn(n):
         num += 1
 
 sum_of_first_n = sum(firstn(1000000))
-----
+```
 
-Generator expressions
----------------------
+## Generator expressions
 
 * syntactically different form Comprehension with a parenthesis!
 * Generators are cheaper than comprehension as the list isn't created right away
 
 (expression for i in origList)
 
-closures
-----------
+## closures
 
 * A (typically anonymous) function that takes arguments (like normal function) and has a state inside it.
 * The state is set up in the closure at the time of its creation.
@@ -489,6 +493,7 @@ closures
 
 A closure is typically created like this
 
+```python
 def create_a_closure(state1_for_closure):
   state2_for_closure = "some_initial_value"
   def my_closure(closure_arg1, closure_arg2):
@@ -500,23 +505,24 @@ def create_a_closure(state1_for_closure):
 
 #Later
 a_closure = create_a_closure("intial_value_for_state1")
+```
 
-decorators
------------
+## decorators
 
 * The intent of a decorator is to wrap around any function with added behavior
 * You write a closure like situation, where a function takes one function as arg, which defines a inner funciton and returns it.
 * The inner funciton does fancy stuff (and calling the actual supplied function)
 * Later you can just use the decorator syntax
-@decorator_name
-def function_that_will_be_wrapped(...):
-  ...
-
+    ```python
+    @decorator_name
+    def function_that_will_be_wrapped(...):
+      ...
+    ```
 * Users just invoke normally with function_that_will_be_wrapped() and that gets wrapped by the decorator
 
-itertools
-----------
+## itertools
 
+```python
 itertools.permutations(iterable, size_to_work)
 itertools.combinations(iterable, size_to_work)
 itertools.product(iterable, iterable)           -> (1,a), (1,b), (1,c), (2,a), (2,b), (2,c)
@@ -531,9 +537,9 @@ itertools.izip_longest(it1,it2,..itn)           -> ..zip till longes, filling No
 itertools.cycle(iterable)                       -> keeps cycling on the iterable endlessly
 
 reversed(iterable)                              -> native way to reverse any interable
+```
 
-Simple commands
-----------------
+# Simple commands
 
 print()   # also prints a "\n" at end of string
 
@@ -1417,6 +1423,17 @@ source activate
 (or you can direclyt invoke the python from here to run)
 
 path/to/a/parent_folder/hosting/virtual/envs/name_of_env/bin/python <your script>
+
+Python Interpreter notes
+------------------------
+
+Use underscore to capture last value
+
+```python
+>>> 5 + 6
+>>> a = _
+```
+
 
 pdb
 ----
