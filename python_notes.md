@@ -1109,6 +1109,9 @@ requests.packages.urllib3.disable_warnings()
 import bs4
 
 soup = bs4.BeautifulSoup(html_data,'html.parser')
+#or
+with open("local_file","r") as f:
+    soup = bs4.BeautifulSoup(f, 'html.parser')
 
 # Look at the parts of a tag
 tags = soup('a')
@@ -1117,6 +1120,18 @@ print 'TAG:',first_tag
 print 'URL:',first_tag.get('href', None)
 print 'Contents:',first_tag.contents[0]
 print 'Attrs:',first_tag.attrs
+
+#find by id
+elem = soup.find("div", {"id": "articlebody"})
+
+#find by class
+mydivs = soup.findAll("div", {"class": "stylelistrow"})
+
+#walk over a table
+rows = soup.find("table", border=1).find("tbody").find_all("tr")
+for row in rows:
+    cells = row.find_all("td")
+    rn = cells[0].get_text()
 
 #pretty
 soup.prettify()
