@@ -161,12 +161,16 @@ for key in a_dict:
 # if u need boht key and value, then use iteritems
 for key,value in a_dict.iteritems()
 
+# merge a diction in another one.
+#  if the same key exists in both, the new one's value will win!
 orig_dict.update(another_dict)
 ```
 
 ### Use collections.defaultdict for handy defaulting
 
 * first arg is a factory-method.
+    * what this means is an existing object wont work if you
+      want that as a template! Use a lambda if you can here.
 
 ```python
 >>> s = [('yellow', 1), ('blue', 2), ('yellow', 3), ('blue', 4), ('red', 1)]
@@ -1297,6 +1301,18 @@ with daemon.DaemonContext():
     main()
 ```
 
+## csv
+
+
+```python
+import csv
+
+with open("file_name.csv") as fd:
+    cvs_lines = cvs.reader(fd)
+    for row in cvs_lines:
+        print("col-0:%d col-1:%s"%(row[0],row[1]))
+```
+
 ## Json
 
 ```python
@@ -1499,6 +1515,7 @@ import pdb
 #This will break where you want
 # you get a prompt
 # and study variables here
-pdb.trace()
+pdb.set_trace()
 ```
+
 
