@@ -583,6 +583,13 @@ Use underscore to capture last value
 >>> a = _
 ```
 
+### Get interpreter in between
+
+```python
+import code
+code.interact(local=locals())
+```
+
 ### reload a module in interpreter
 
 ```python
@@ -770,6 +777,24 @@ python -v
 if __name__ == "__main__":
 ```
 
+## Simple UDP server in python
+
+```python
+import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+host="127.0.0.1"
+port=19999
+s.bind((host, port))
+
+#block till a pkt
+(data, addr) = s.recvfrom(128*1024)
+
+```
+
+
 
 # Various Python Libraries
 
@@ -789,9 +814,9 @@ parser.add_argument("many_optional", help="User may give zero or  more of this a
 
 # dash- is converted to underscore
 
-parsed_args = parser.parse_args()
+cmd_options = parser.parse_args()
 parser.add_argument("-v","--verbose", help="increase output verbosity", action="store_true")       # captures if --verbosity present or not in arg-list. No arg per-se for this option.
-if parsed_args.verbose:
+if cmd_options.verbose:
       print("verbosity turned on")
 
 also:
@@ -835,6 +860,9 @@ valid_filename = re.sub(r'[\\/:"*?<>|]+', "_", var_having_junk_chars)
 
 # if u are using a regex a lot, pre-compile it
 
+flags:
+re.IGNORECASE
+
 pat_object = re.compile(pattern,flags)
 pat_object.search(haystack)
 pat_object.match(check_exact_match_input)
@@ -863,9 +891,9 @@ os.getcwd()         # get cwd pwd
 os.chdir(path)      # cd to a working-dir
 os.path.dirname(os.path.realpath(__file__))   # get dir of current file
 
-os.path.isfile('path')  # true if its regular file or sym-link to regular file
+os.path.isfile('path')  # true if its regular file or sym-link to regular file, -f
 os.path.islink('path')  # true if its a sym link
-os.path.isdir('path')   # true if its a dir or a sym link to a dir
+os.path.isdir('path')   # true if its a dir or a sym link to a dir, -d
 
 # create/make a new dir , mkdir
 if not os.path.exists(directory):
@@ -973,6 +1001,16 @@ list_of_filenames=glob.glob("*.py")
 
 import sh
 a=sh.ls('-1','.')
+
+# to recursively match filenaes
+
+import fnmatch
+import os
+
+matches = []
+for root, dirnames, filenames in os.walk('src'):
+    for filename in fnmatch.filter(filenames, '*.c'):
+        matches.append(os.path.join(root, filename))
 ```
 
 ### File locking
@@ -1036,6 +1074,12 @@ datetime.datetime.strftime('format')                    # print a time in a stri
 datetime.timedelta is returned when you subtract 2 datetime.datetime objects
 
 date = datetime_obj + datetime.timedelta(days=30)
+
+#create a datetime - yr,mth,date are mand. hr, min, sec, micro-sec, tz are opt.
+datetime.datetime(2019, 1, 19)
+
+#convert datetime to date
+datetime_object.date()
 
 #to get time in seconds since epoch
 time.mktime(datetime.datetime.now().timetuple())
@@ -1184,10 +1228,14 @@ xml.dom.minidom.parseString(lxml.etree.tostring(mytree)).toprettyxml()
 
 ## Selenium
 
+* Download chrome driver from google - https://sites.google.com/a/chromium.org/chromedriver/home
+* pip install selenium lxml csselect
+
 ```python
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
+import bs4
 chrome_options = Options()
 chrome_options.add_argument("--headless")
 driver = webdriver.Chrome(chrome_options=chrome_options)
@@ -1266,13 +1314,9 @@ logging.debug("This is a debug message")
 sess_logger = logging.getLogger("SESS")
 sess_logger.setLevel(logging.DEBUG)
 fh = logging.FileHandler('session.log')
-fh.setLevel(logging.DEBUG)
-sess_logger.add_handler(fh)
+fh.setLevel(logging.WARN)
+sess_logger.addHandler(fh)
 sess_logger.debug("This is a session subsystem log")
-
-#using fnmatch to match glob expressions
-import fnmatch
-[ name for name in os.listdir(given_dir) if fnmatch.fnmatch(name, '*.txt') ]
 ```
 
 * Note: logging defers calling the arg's __str__ function. Do
@@ -1517,5 +1561,58 @@ import pdb
 # and study variables here
 pdb.set_trace()
 ```
+
+## numpy
+
+```python
+a_numpy_array = numpy.linspace(-np.pi, np.pi, 256, endpoint=True)
+```
+
+## plotting
+
+Excellent introduction in https://www.labri.fr/perso/nrougier/teaching/matplotlib/
+Another good introduction in https://realpython.com/blog/python/python-matplotlib-guide/
+
+```python
+import matplotlib.pyplot
+
+matplotlib.pyplot.plot(x,y,'b-')
+matplotlib.pyplot.show()
+
+#or if you have dates
+matplotlib.pyplot.plot_date(xdates,y,'b-')
+matplotlib.pyplot.show()
+
+matplotlib.pyplot.xlabel('what is x')
+matplotlib.pyplot.ylabel('what is in y')
+matplotlib.pyplot.title('title of this figure')
+
+```
+
+## Oauth
+
+```
+pip install cryptography
+pip install oauth-lib
+```
+
+Read here: http://requests-oauthlib.readthedocs.io/en/latest/oauth2_workflow.html
+
+
+## vlc media player
+
+```
+player = vlc.MediaPlayer(f)
+r = player.play()
+
+#get time in ms
+player.get_time()
+#get tot-time
+player.get_length()
+#toggle play/pause
+player.pause()
+player.audio_get_volume()
+```
+
 
 

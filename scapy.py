@@ -1,5 +1,7 @@
 
 import scapy.all
+from scapy.layers.inet import *
+#from scapy.layers.inet import IP, ICMP, Ether
 
 #capture
 sniff(iface="nap301",filter="udp",prn=lambda x:x.summary(),count=10)
