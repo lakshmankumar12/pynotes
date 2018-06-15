@@ -234,8 +234,11 @@ ascii_form = unicode_data.encode('ascii','xmlcharrefreplace')  # you get &#<num>
 
 ```python
 with open('file','w') as fd:
-    fd.write(unicode_string.encode('utf-8'))
 
+    fd.write(unicode_string.encode('utf-8'))
+```
+
+```
 in python2,
    str is actually a byte-string.
    unicode is an array of unicode-points.
@@ -249,11 +252,13 @@ in python3,
 
 ## bytes
 
+```
 defined as b'\xfe' or b'abc'
 
 a=b'\x65\x48'        # a bytes object
 a.decode('ascii')    # gives a string object.
                      # encode/decode complement bytes/str conversion
+```
 
 bytes like string is immutable
 bytearray is mutuable
@@ -666,6 +671,7 @@ def function():
 
 
 Various ways to catch exceptions:
+* This is in python3
 
 ```python
 except IOError as e:
@@ -681,7 +687,7 @@ except Exception,e:
   print str(e)
 ```
 
-## Reading file line by line:
+## Reading file line by line
 
 
 ```python
@@ -720,6 +726,8 @@ if isinstance(var_name, list):
 ```python
 #what you probably need most of the time
 variable=raw_input("Prompt string w/o newline:") # Gets whatever is given and assigns to variable which is now a str. You then cast this string into whatever you want.
+
+# in python3, raw_input is input
 
 #also know:
 variable=input("Prompt string w/o newline:")     # Gets user-input and interprets it as a python-expression! Thus unquoted string-literals are interpreted as var-names
@@ -842,6 +850,10 @@ if not os.path.exists(sys.argv[1]):
 
 sys.exit(0)
 
+## environment variables
+
+os.environ['HOME']
+
 ## regular expression  regexp regex
 
 ```python
@@ -901,7 +913,9 @@ if not os.path.exists(directory):
 
 os.rename(src,dst)   # mv in python
 
-os.remove(path)  #delete a file
+os.unlink(dst)  # rm a file , delete
+os.remove(dst)  # unlink/remove are the same
+
 shutil.rmtree(dir_with_contents)  # just delete a dir / folder with contents
 shutil.copyfile(src,dst)          # file copy / cp
 
@@ -915,7 +929,8 @@ os.system("your command with all args in a single string")
 
 import subprocess
 subprocess.call(["ls","-l"])   # Just run it clobbering ur stdout with the cmd's stdout.
-subprocess.check_output(["ls","-1"])  # Run and get the o/p as return value
+output = subprocess.check_output(["ls","-1"])  # Run and get the o/p as return value
+                                               # But stderr will still clobber your stderr
 
 boolean_variable=os.access("/path/to/file",os.F_OK)  # does file exist at all
 boolean_variable=os.access("/path/to/file",os.R_OK)
@@ -980,22 +995,6 @@ grep_process = Popen(['grep', 'ms'],stdin=ls_process.stdout, stdout=PIPE)
 ls_process.stdout.close() # enable write error in ls if grep dies
 out, err = grep_process.communicate()
 
-def execute_cmd(cmd, print_cmd=True, error_ok=False, print_op=False, dry_run=False):
-  if print_cmd:
-    print ("Executing :%s"%' '.join(cmd))
-  if dry_run:
-    return ""
-  a=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-  output,err=a.communicate()
-  errcode = a.wait()
-  if err or (errcode != 0):
-    if not error_ok:
-       print("got a error,err:%s, errcode:%d"%(err,errcode))
-       sys.exit(1)
-  if print_op:
-    print("Got:\n%s"%output)
-  return output
-
 import glob
 list_of_filenames=glob.glob("*.py")
 
@@ -1011,6 +1010,29 @@ matches = []
 for root, dirnames, filenames in os.walk('src'):
     for filename in fnmatch.filter(filenames, '*.c'):
         matches.append(os.path.join(root, filename))
+```
+
+* Curated external-command execute
+
+```python
+def execute_cmd(cmd, print_cmd=False, error_ok=True, shouldErrBeEmpty=True, print_op=False, dry_run=False, shellChoice=False):
+    if print_cmd:
+        if shellChoice:
+            print ("Executing :{}".format(cmd))
+        else:
+            print ("Executing :%s"%' '.join(cmd))
+    if dry_run:
+        return ""
+    a=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shellChoice)
+    output,err=a.communicate()
+    errcode = a.wait()
+    if (errcode != 0) or (shouldErrBeEmpty and not err):
+        if not error_ok:
+            print("got a error,err:%s, errcode:%d"%(err,errcode))
+            sys.exit(1)
+    if print_op:
+        print("Got:\n%s"%output)
+    return (errcode, output, err)
 ```
 
 ### File locking
@@ -1175,11 +1197,20 @@ elem = soup.find("div", {"id": "articlebody"})
 #find by class
 mydivs = soup.findAll("div", {"class": "stylelistrow"})
 
+#find only one level
+li_items = ol_item.findAll("li", recursive=False)
+
+#check if a element has an attribute
+# all attrbutes are in dict attrs
+if 'some_attribute' in div_elem.attrs
+# .. check if is some value is present in a attribute
+if 'className' in div_elem.attrs['class']
+
 #walk over a table
 rows = soup.find("table", border=1).find("tbody").find_all("tr")
 for row in rows:
     cells = row.find_all("td")
-    rn = cells[0].get_text()
+    rn = cells[0].get_text()         # textContent
 
 #pretty
 soup.prettify()
@@ -1363,9 +1394,10 @@ with open("file_name.csv") as fd:
 #read a string as json and creates a close python'ish object
 obj = json.loads(str)
 
-#put an arbitrary python object as string
+#put an arbitrary phttps://pyformat.infoeython object as string
 # Not all built-in python objects are convertible, but not user-defined objects
 str = json.dumps(obj)
+#pretty print json
 str = json.dumps(obj, indent=4, sort_keys=True)
 
 #for file
@@ -1612,6 +1644,22 @@ player.get_length()
 #toggle play/pause
 player.pause()
 player.audio_get_volume()
+```
+
+## Sched
+
+General purpose event scheduler
+
+```python
+import sched, time
+s = sched.scheduler(time.time, time.sleep)
+def do_something(sc): 
+    print "Doing stuff..."
+    # do your stuff
+    s.enter(60, 1, do_something, (sc,))
+
+s.enter(60, 1, do_something, (s,))
+s.run()
 ```
 
 
