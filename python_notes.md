@@ -1012,28 +1012,7 @@ for root, dirnames, filenames in os.walk('src'):
         matches.append(os.path.join(root, filename))
 ```
 
-* Curated external-command execute
-
-```python
-def execute_cmd(cmd, print_cmd=False, error_ok=True, shouldErrBeEmpty=True, print_op=False, dry_run=False, shellChoice=False):
-    if print_cmd:
-        if shellChoice:
-            print ("Executing :{}".format(cmd))
-        else:
-            print ("Executing :%s"%' '.join(cmd))
-    if dry_run:
-        return ""
-    a=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shellChoice)
-    output,err=a.communicate()
-    errcode = a.wait()
-    if (errcode != 0) or (shouldErrBeEmpty and not err):
-        if not error_ok:
-            print("got a error,err:%s, errcode:%d"%(err,errcode))
-            sys.exit(1)
-    if print_op:
-        print("Got:\n%s"%output)
-    return (errcode, output, err)
-```
+* Curated external-command execute  -- see my_python_util.py
 
 ### File locking
 
@@ -1330,7 +1309,7 @@ except pexpect.EOF:
   #pass
 except pexpect.TIMEOUT:
 ```
-
+* See my_python_util.py for a general wrapper
 
 ## logging
 
