@@ -398,6 +398,10 @@ class Derived(Base):
   def __init__(self, derived_args):
     Base.__init__(self, base_args)
     self.derived_member = derived_args
+
+  def overriddenMethod(self, args):
+    super(Base, self).overriddenMethod(args)
+    moreWorkHere()
 ```
 
 ### Magic attributes of a class
@@ -674,10 +678,13 @@ Various ways to catch exceptions:
 * This is in python3
 
 ```python
+import traceback
+
 except IOError as e:
   e.whatever..
   e.errno
   e.strerror
+  var = traceback.format_exc()
 ```
 
 Capture all Exceptions!
@@ -802,6 +809,18 @@ s.bind((host, port))
 
 ```
 
+## signal handler
+
+```python
+import signal, os
+
+def handler(signum, frame):
+    print 'Signal handler called with signal', signum
+    raise IOError("Couldn't open device!")
+
+# Set the signal handler and a 5-second alarm
+signal.signal(signal.SIGALRM, handler)
+```
 
 
 # Various Python Libraries
@@ -928,6 +947,14 @@ def copycontents(src,dst):
 os.system("your command with all args in a single string")
 
 import subprocess
+
+finished_result=subprocess.run(["ls","-l","file"],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+finished_result=subprocess.run(["ls","-l","file"],...,stdin="some-string")
+finished_result.returncode
+finished_result.stdout
+finished_result.stderr
+subprocess.run("ls -1",shell=True,check=True)
+
 subprocess.call(["ls","-l"])   # Just run it clobbering ur stdout with the cmd's stdout.
 output = subprocess.check_output(["ls","-1"])  # Run and get the o/p as return value
                                                # But stderr will still clobber your stderr
@@ -1051,6 +1078,8 @@ sleep(0.1) # Time in seconds.
 ```
 
 ### datetime
+
+https://stackabuse.com/how-to-format-dates-in-python/
 
 ```python
 #Note: datetime module has 2 objects - date  and datetime. (And a timedelta)

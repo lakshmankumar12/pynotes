@@ -44,7 +44,31 @@ def general_expect(child, expect_list, intent_desc, eof_ok=0, print_output=0, ti
     raise Exception(err_str);
   return result
 
+import struct, fcntl, termios, signal, sys
+from general_expect import general_expect as expect_child
 
+def get_parent_win_size():
+    with open(os.ctermid(), 'r') as fd:
+        packed = fcntl.ioctl(fd, termios.TIOCGWINSZ, struct.pack('HHHH', 0, 0, 0, 0))
+        rows, cols, h_pixels, v_pixels = struct.unpack('HHHH', packed)
+        return (rows,cols)
+    return (24,80)
+
+def spawn_child_later_for_interaction(command):
+    child = pexpect.spawn(command, encoding='utf-8')
+    if not child:
+        raise Exception("no child for command:{}".format(command))
+
+    def sigwinch_passthrough (sig, discard_arg):
+        s = struct.pack("HHHH", 0, 0, 0, 0)
+        a = struct.unpack('hhhh', fcntl.ioctl(sys.stdout.fileno(), termios.TIOCGWINSZ , s))
+        child.setwinsize(a[0],a[1])
+
+    (r,c) = get_parent_win_size()
+    signal.signal(signal.SIGWINCH, sigwinch_passthrough)
+    child.setwinsize(r,c)
+
+    return child
 
 def execute_cmd(cmd, print_cmd=False, error_ok=True, shouldErrBeEmpty=True, print_op=False, dry_run=False, shellChoice=False):
     if print_cmd:
