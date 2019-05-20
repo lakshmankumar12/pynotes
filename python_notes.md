@@ -414,6 +414,7 @@ n.__repr__     # is a function, that will used to stringize the class.
                # Tip, it takes mandorty self, u can actaully pass more args
                # as long as u have default-args.
 
+#search attribute set attr set_attr has_attr
 hasattr(object, "member")  # check if object.member exists
 setattr(object, "member", "value")
 ```
@@ -722,6 +723,25 @@ for line_number, line in enumerate(fd):   # will also get line-number along
 
 enumerate(iterable,start_value=0)         # will start value from start_value
 
+### Reading N lines
+
+```
+with open(filename, 'r') as infile:
+    lines = [line for line in infile][:N]
+
+from itertools import izip_longest
+
+def grouper(iterable, n, fillvalue=None):
+    args = [iter(iterable)] * n
+    return izip_longest(*args, fillvalue=fillvalue)
+
+with open(filename) as f:
+     for lines in grouper(f, N, ''):
+         assert len(lines) == N
+         # process N lines here
+```
+
+
 ## To find if a variable is a list/scalar
 
 ```python
@@ -829,10 +849,12 @@ signal.signal(signal.SIGALRM, handler)
 
 ```python
 import argparse
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-v","--verbose", help="increase output verbosity", action="store_true")       # captures if --verbosity present or not in arg-list. No arg per-se for this option.
 parser.add_argument("-v","--verbose", help="increase output verbosity", action="count")            # captures how many times --verbosity was present in arg-list. No arg per-se for this option.
 parser.add_argument("-v","--verbose", help="increase output verbosity", type=int)                  # --verbosity <int>
+parser.add_argument("-v","--verbose", help="increase output verbosity", type=float)                  # --verbosity <int>
 parser.add_argument("-v","--verbose", help="increase output verbosity", type=int, choices=[0,1,2]) # --verbosity <0|1|2>
 parser.add_argument("str_arg",   help="give a string argument (this is a mandatory argment)")
 parser.add_argument("int_arg",   help="give a int arg (this is a mandatory argment)", type=int)
@@ -841,10 +863,15 @@ parser.add_argument("many_optional", help="User may give zero or  more of this a
 
 # dash- is converted to underscore
 
-cmd_options = parser.parse_args()
-parser.add_argument("-v","--verbose", help="increase output verbosity", action="store_true")       # captures if --verbosity present or not in arg-list. No arg per-se for this option.
-if cmd_options.verbose:
-      print("verbosity turned on")
+# COPY THIS for fresh scripts!!
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-v","--verbose", help="increase output verbosity", action="store_true")       # captures if --verbosity present or not in arg-list. No arg per-se for this option.
+    cmd_options = parser.parse_args()
+    if cmd_options.verbose:
+          print("verbosity turned on")
+
+    return cmd_options
 
 also:
 group = parser.add_mutually_exclusive_group()
@@ -922,9 +949,13 @@ os.getcwd()         # get cwd pwd
 os.chdir(path)      # cd to a working-dir
 os.path.dirname(os.path.realpath(__file__))   # get dir of current file
 
-os.path.isfile('path')  # true if its regular file or sym-link to regular file, -f
+os.path.isfile('path')  # true if its regular file or sym-link to regular file, if [ -f file ] check in sh
 os.path.islink('path')  # true if its a sym link
 os.path.isdir('path')   # true if its a dir or a sym link to a dir, -d
+
+#get home folder
+homefolder = os.path.expanduser("~")
+anyfolderunderhome = os.path.expanduser("~/.pyhistory")
 
 # create/make a new dir , mkdir
 if not os.path.exists(directory):
@@ -1204,6 +1235,11 @@ elem = soup.find("div", {"id": "articlebody"})
 
 #find by class
 mydivs = soup.findAll("div", {"class": "stylelistrow"})
+#find ANY matching class
+mydivs = soup.findAll("div", {"class": ["classVal1", "classVal2"]})
+#find ALL matching classes. This works only for classes. The above
+#work for any attribute of the element-type
+mydivs = soup.select("div.classVal1.classVal2")
 
 #find only one level
 li_items = ol_item.findAll("li", recursive=False)
