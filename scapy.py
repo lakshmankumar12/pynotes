@@ -1,4 +1,12 @@
+'''
+Good docs of scapy:
 
+#on sr functions
+https://thepacketgeek.com/scapy-p-06-sending-and-receiving-with-scapy/
+
+
+
+'''
 import scapy.all
 from scapy.layers.inet import *
 #from scapy.layers.inet import IP, ICMP, Ether
@@ -21,6 +29,7 @@ hexdump(pkt)
 pkt.summary()
 pkt.show()
 
+# getting individual fields in a pkt
 pkt[IP]
 pkt[IP].src
 pkt[IP].dst
@@ -28,6 +37,10 @@ pkt[IP][UDP]
 pkt[IP][UDP].sport
 pkt[IP][UDP].payload
 
+## To explore availalbe fields , use the pkt.show() api.
+
+## Check if pkt has a layer
+pkt.haslayer(IP)
 
 #ping
 dip="10.10.1.1"
