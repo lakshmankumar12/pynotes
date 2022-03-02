@@ -8,14 +8,19 @@ https://thepacketgeek.com/scapy-p-06-sending-and-receiving-with-scapy/
 
 '''
 import scapy.all
+from scapy.all import *
 from scapy.layers.inet import *
 #from scapy.layers.inet import IP, ICMP, Ether
 
 #capture
+#  use the count arg to return immdly after n pkts
 sniff(iface="nap301",filter="udp",prn=lambda x:x.summary(),count=10)
 
 #convert pkt to str
 str(pkt)
+
+#convert pkt to bytes to send if you need to write() it.
+raw(pkt)
 
 #list of fields values to stdout. Returns None
 ls(pkt)
@@ -36,6 +41,10 @@ pkt[IP].dst
 pkt[IP][UDP]
 pkt[IP][UDP].sport
 pkt[IP][UDP].payload
+
+# removing a layer
+#  Remove/Strip ether layer off.
+ippkt = etherpkt[IP]
 
 ## To explore availalbe fields , use the pkt.show() api.
 

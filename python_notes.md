@@ -213,7 +213,7 @@ a.rstrip()
 a.lstrip()
 a.replace(what_to_replace,to_replace_with,[,max])   #bbbbbb
 
-ord(a)    # gives the ordinal value of a, give just one char as input
+ord(a)    # gives the ordinal value of a, give just one char as input. I.e get the int-value of a char.
 chr(num)  # inverse of ord
 
 a.startswith()  # boht accept single str or tuple of strings
@@ -349,6 +349,20 @@ def manyArgs(arg1, arg2, *args, **kwargs):
   #kwargs is a dict of all named args
 ```
 
+* Its also possible to use this other way around
+  Search: expand arg list function
+
+```python
+def fun(arg1, arg2)
+    #regular fun using arg1, arg2
+    pass
+
+a=[1,2]
+dict_b={'arg1':1, 'arg2':2}
+func(*a)
+func(**b)
+```
+
 ## swap 2 variables
 
 ```python
@@ -356,6 +370,13 @@ a,b = b,a
 ```
 
 # More pythonic constructs
+
+## source-code has utf-8 chars
+
+```py
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+```
 
 
 ## class
@@ -812,6 +833,32 @@ python -v
 if __name__ == "__main__":
 ```
 
+## Simple TCP client to send binary info
+
+
+```python
+import socket
+import struct
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("169.254.69.1",6005))
+f="testfile"
+m="aaa"
+hdr=struct.pack("II128s33sBBBI",32,16,f,m,1,0,0,0)
+s.send(hdr)
+```
+
+### send data in f-ack
+
+```python
+import socket
+s = socket.socket()
+s.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, False)
+s.connect(("10.1.1.2",80))
+s.send(b"GET / HTTP/1.1\r\nHost: 10.1.1.2\r\n\r\n")
+print(s.recv(1024))
+```
+
 ## Simple UDP server in python
 
 ```python
@@ -856,6 +903,8 @@ parser.add_argument("-v","--verbose", help="increase output verbosity", action="
 parser.add_argument("-v","--verbose", help="increase output verbosity", type=int)                  # --verbosity <int>
 parser.add_argument("-v","--verbose", help="increase output verbosity", type=float)                  # --verbosity <int>
 parser.add_argument("-v","--verbose", help="increase output verbosity", type=int, choices=[0,1,2]) # --verbosity <0|1|2>
+parser.add_argument("-l","--long-arg", help="repeats", nargs="+", required=True)                   # -l arg1 arg2 arg3  .. flipside: cant distinguish positional args from args to this option
+parser.add_argument("-L","--long-arg2", help="repeats", type="append")                             # -l arg1 -l arg2 -l arg3 .. better.
 parser.add_argument("str_arg",   help="give a string argument (this is a mandatory argment)")
 parser.add_argument("int_arg",   help="give a int arg (this is a mandatory argment)", type=int)
 parser.add_argument("optional",  help="User may skip this", nargs="?", default="abc")
@@ -984,7 +1033,12 @@ finished_result=subprocess.run(["ls","-l","file"],...,stdin="some-string")
 finished_result.returncode
 finished_result.stdout
 finished_result.stderr
+
 subprocess.run("ls -1",shell=True,check=True)
+completedProcess=subprocess.run(["ls", "-l", "/dev/null"], capture_output=True)
+print ("stdout was:%s"%completedProcess.stdout)
+print ("stderr was:%s"%completedProcess.stderr)
+print ("exit code was:%s"%completedProcess.returncode)
 
 subprocess.call(["ls","-l"])   # Just run it clobbering ur stdout with the cmd's stdout.
 output = subprocess.check_output(["ls","-1"])  # Run and get the o/p as return value
@@ -1082,6 +1136,21 @@ fcntl.flock(x, fcntl.LOCK_EX | fcntl.LOCK_NB)
 Unlocking is just as easy:
 
 fcntl.flock(x, fcntl.LOCK_UN)
+```
+
+### Temp file
+
+```python
+import os
+import tempfile
+
+fd, path = tempfile.mkstemp()
+try:
+with os.fdopen(fd, 'w') as tmp:
+# do stuff with temp file
+tmp.write('stuff')
+finally:
+os.remove(path)
 ```
 
 ## random
@@ -1427,9 +1496,33 @@ with daemon.DaemonContext():
 import csv
 
 with open("file_name.csv") as fd:
-    cvs_lines = cvs.reader(fd)
-    for row in cvs_lines:
+    csv_lines = csv.reader(fd)
+    for row in csv_lines:
         print("col-0:%d col-1:%s"%(row[0],row[1]))
+
+```
+
+For writing
+
+```
+c = csv.writer(filehandle_from_open)
+c = csv.writer(f, quoting=csv.QUOTE_ALL)
+```
+
+## excel to csv
+
+```python
+import openpyxl
+import csv
+
+def xls_to_csv(infile, outfile):
+    wb = openpyxl.load_workbook(infile)
+    sh = wb.active
+    with open(outfile, 'w', newline="") as f:
+        c = csv.writer(f)
+        for r in sh.rows:
+            c.writerow([cell.value for cell in r])
+
 ```
 
 ## Json
