@@ -400,6 +400,12 @@ class Name:
     pass                        # note the absence of self for static member functions. Invoked as ClassName.function()
     Name.count++;               #refering a Name.member brings in a c++-style static member of the class.
 
+  @classmethod
+  def function(cls, arg1):
+    pass                        # here the first arg is the Class itself. To illustrate, this is like doing type(self).access
+    cls.count++;                # from a regular class. The cls is a convenient first arg. Has the adv of not having to edit
+                                # the function text if the classname (Name in this case) changes.
+
 #Later..
 n = Name(10,12)
 ```
@@ -408,7 +414,7 @@ n = Name(10,12)
 * In fact, attributes of a class can be added at will anytime. There is really no
   fixed-set of attributes for a class
   n.newAttribute = "abc"   # is perfectly valid anywhere!
-* ClassName.var_name 
+* ClassName.var_name
     * when used with ClassName refers to a var_name in class-scope(static like)
     * DONT FORGET the ClassName - otherwise, it just uses/refers to a local var.
 * methods in the class can work on static members as long as they use ClassName to scope it.
@@ -1799,5 +1805,8 @@ s.enter(60, 1, do_something, (s,))
 s.run()
 ```
 
+## TunTap interfaces
+
+* snippet is here: https://gist.github.com/abdelrahman-t/a23f57986a40f54108a71d4b91f145b2
 
 
