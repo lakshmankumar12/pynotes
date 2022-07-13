@@ -999,7 +999,9 @@ os.path.join(dir,filename)
 os.path.abspath(path)
 os.path.realpath(path)  # resolves sym-links!
 os.path.exists('path/to/file')      #file check present
-os.makedirs(path)   # no mkdir -p option.. just check isdir and then do this or do , catch except OSError (latter better)
+os.makedirs(path)   # it will create all dirs in path if needed.
+                    # But the last dir MUST be non-existant.
+                    # You can either check isdir() before, or catch FileExistsError
 os.getcwd()         # get cwd pwd
 os.chdir(path)      # cd to a working-dir
 os.path.dirname(os.path.realpath(__file__))   # get dir of current file
