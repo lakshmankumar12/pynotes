@@ -124,42 +124,87 @@ Sorting a list
 ## Sets
 
 * Use `{ , .. , }` for sets
-* sets dont remember order of their elements
+    * Python is intelligent to figure out if its set or dict based on
+      the presence of `:` in the individual elements.
+    * Note: Empty `{}` creates a dict
+      ```
+      a={}     # creates a dict
+      a=set()  # to create empty set
+      ```
+* sets dont remember order of their elements. It actually unordered_set()
 * values in the sets are unique.
 
-Operations on set:
+* Operations on set:
+```python
+# access
+## regular iteration over set works
+for i in set_a:
+    do_whatever(i)
 
-`a.add(value)`               # adds a value to set if its not already present.
-`a.update(value, set, list)` # addes the value, members of set, list to the set.
-`a.discard(value)`           # removes the value from set. No error if value not present
-`a.remove(value)`            # removes the value from set. KeyError is raised if value not present.
-`a.pop()`                    # removes some arbitrary member from set. KeyError on empty set
-`a.clear()`                  # clears the set. same as a=set()
-`a.union(b)`                 # returns a *new* set that is union of a & b
-`a.intersection(b)`
-`a.difference(b)`            # in a not in b
-`a.symmetric_difference(b)`  # in strictly only of a and b
+# if used for checking
+if i in set_a:
+    do_something(i)
 
-Note: a= {} creates a empty *dictionary*, not set.
+# add to set
+a.add (value)               # adds if doesn't exist. Nothing if it already exists
+                            # no native operation for check_and_add
+                            #     if value in set_a:
+                            #           add
+                            #     else:
+                            #           do_what_you_want()
+# extend from other iterables
+a.update(any_iterable)      # update take any number of iterables and add them to set
+a.update(any_iterable, one_more_such)
+
+# remove
+a.discard(value)            # remove value from set. No error if not found
+a.remove(value)             # remove value from set. KeyError raised if not found
+a.pop()                     # removes some arbitrary member from set. KeyError on empty set
+                            #   but DONT expect randomness. Based on impl.
+                            #   you will see the same element coming out
+                            #   from a same set over and over.
+a.clear()                   # clears the set. same as a=set()
+
+# cool stuff with set
+a.union(b)                  # returns new set - union of a & b
+a.intersection(b)           # returns new set - both in a & b
+a.difference(b)             # returns new set - in a, but not in b
+a.symmetric_difference(b)   # returns new set - in strictly only of a and b
+```
 
 ## Dictionary
 
 * user { key:value } for dictionary
 
-a[key] = value  # for assignment or referenence. Note they key is indexed using squre braket only!
+```python
+
+value = a[key]              # get a value. Throws KeyError if not found
+value = a.get(key)          # None if key is not found
+value = a.get(key, def_val) # get a value and supply default if it doesn't exist
+
+a[key] = value  # for assignment or referenence. Note they key is indexed using square bracket
 
 a.keys()    # gives a list of keys of dictionary a, not necesarily in sorted order .. probably iterable in py-3
 a.vaues()   # gives a list of values
 a.items()   # gives a list of tuple of (key, value) from a dictionary
 
+del a[key]  # remove the key off the dict. KeyError thrown if not found
 a.pop(key [, default])   # dels the key and returns its value. If key isn't present default is given. If default isn't supplied KeyError is generated
 
-```python
+# dict literal, last comma allowed!
+a={
+"key1":"value1",
+"key2":"value2",
+"key3":"value3",
+}
+
 # when iterating over dict, u typically iterate over keys
 for key in a_dict:
 
-# if u need boht key and value, then use iteritems
+# py2: if u need both key and value, then use iteritems
 for key,value in a_dict.iteritems()
+# py3: its just items()
+for key,value in a_dict.items()
 
 # merge a diction in another one.
 #  if the same key exists in both, the new one's value will win!
@@ -189,9 +234,30 @@ my_holder = tree()
 
 ## strings
 
+### Literals
+
+```python
+# simple strings
+'single quoted',  'single quote can have double " "inside it'
+"doubled quoted", "double quote can have single ' ' inside it"
+
+#multiline
+a = '''This is a multiline
+       preserving line-breaks and initial spaces'''
+
+# multiline just in code
+# Note there is N-O comma between them
+a = ("this is a convenient"
+     " way to code a lengthy string"
+     " without newlines or initial spaces")
+```
+
+
+### notes
+
 * Every string is a UTF-8 encoded sequence of characters in python-3.
 * strings can be single or double-quoted(abs no diff. This helps to avoid escaping either). Triple single quotes is for long strings. r'raw \.string' is a raw strings
-* + is a way to concatenate strings
+* `+` is a way to concatenate strings
 
 a.splitlines()       # list of lines. The restult wont have carriage returns.
 a.lower()            # returns a new string that has all lower caps
@@ -302,6 +368,7 @@ with lists.
   Use range function to run over a range.
   range(start-value, end-value+1, increment)
 
+#loops
 for i in list:
   ..use i..
 
@@ -310,6 +377,11 @@ for i in range(1,10):
 
 break
 continue
+
+# use this to get a convenient index as well
+# you can override start value as well.
+for n,i in enumerate(iterable,start_value=0):
+    do_whatever(n,i)
 
 #limit for loop to a number
 for i in itertools.slice(iter,0,limit):
@@ -389,6 +461,8 @@ class Name:
 
   def __init__(self,arg1,arg2):
     self.member1=arg1           #automaticaly adds member1 as a field to the class objects.
+    self._convention_priv_member = 2
+                                #use _beginning names to mean its private. Only convention.
 
   def function(self,arg1):
     pass                        #all member function's first arg is self.
@@ -405,6 +479,15 @@ class Name:
     pass                        # here the first arg is the Class itself. To illustrate, this is like doing type(self).access
     cls.count++;                # from a regular class. The cls is a convenient first arg. Has the adv of not having to edit
                                 # the function text if the classname (Name in this case) changes.
+
+  @property                     # kind of automatically makes this a getter fn
+  def member_name(self):            # for the member.
+    return self._member_name    # Mind you users now do obj.member_name
+                                # instead of obj.member_name()
+
+  @member_name.setter           # similarly for setter.
+  def member_name(self, value):
+    self._member_name = value
 
 #Later..
 n = Name(10,12)
@@ -443,8 +526,16 @@ n.__repr__     # is a function, that will used to stringize the class.
 
 #search attribute set attr set_attr has_attr
 hasattr(object, "member")  # check if object.member exists
+getattr(object, "member")
 setattr(object, "member", "value")
 ```
+
+* object id
+```
+id(anyobject)  # gives a unique id for th object
+
+```
+
 
 ## Global scope
 
@@ -487,11 +578,14 @@ data = map(lambda x: int(x,16), data)
 * User calls next() and gets StopIteration error at end.
 
 
-## Generator
+## generator
 
 * Is a function (defined with def Name():)
 * But has a yield statement in it.
 * You have to first create a object by calling generate_name() [read, generate_name param param]
+    * Note, calling a normal funciton returns whatever the function gives.
+    * Calling a generator function, returns, well a generator.
+        * You have to use the .next() on it to make sennse.
 * Later you call gentr.next() to start getting values out of it.
 * When its done, you get StopIteration thrown (This happens when generator code falls off its def block)
 * On actual invocation (creation of object), no code gets executed.
@@ -549,9 +643,22 @@ a_closure = create_a_closure("intial_value_for_state1")
 * The inner funciton does fancy stuff (and calling the actual supplied function)
 * Later you can just use the decorator syntax
     ```python
+    def decorator_name(original_func):
+        def some_inner_non_exposed_meaningful_name(*args, **kwargs):
+            optional_items = do_fancy_stuff()
+            result = original_func(optional_items, *args, **kwargs)
+            result += more_fancy_stuff_if_be()
+            return result
+        #note you return the fn-object - not call it!
+        return some_inner_non_exposed_meaningful_name
+
+    # now call it as:
     @decorator_name
     def function_that_will_be_wrapped(...):
       ...
+
+    #users later call just, but fancy works happen!
+    a = function_that_will_be_wrapped(..)
     ```
 * Users just invoke normally with function_that_will_be_wrapped() and that gets wrapped by the decorator
 
@@ -573,6 +680,40 @@ itertools.cycle(iterable)                       -> keeps cycling on the iterable
 
 reversed(iterable)                              -> native way to reverse any interable
 ```
+
+# asyncio
+
+## common asyncio statements
+
+```py
+await asyncio.sleep(1)
+
+```
+
+
+## subprocess
+
+https://docs.python.org/3/library/asyncio-subprocess.html
+
+```py
+async def run(cmd):
+    proc = await asyncio.create_subprocess_shell(
+        cmd,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE)
+
+    stdout, stderr = await proc.communicate()
+
+    print(f'[{cmd!r} exited with {proc.returncode}]')
+    if stdout:
+        print(f'[stdout]\n{stdout.decode()}')
+    if stderr:
+        print(f'[stderr]\n{stderr.decode()}')
+
+asyncio.run(run('ls /zzz'))
+```
+
+
 
 # Python Internals
 
@@ -684,43 +825,59 @@ print "format string %d, %s, %s"%(int_var,str_var,"string literal")
 ## Error handling/Exception
 
 ```python
-try:
+# usual copy paste for your error
+# replace the Exception wth your choice of error
 
-except IOError:
+def your_fn():
+    ...
+    try:
+        whatever()
+
+    #copy paste from here:
+    except Exception as e:
+        logging.error("Got error: %s", e)
+        resp = None
+    finally:
+        #always gets executed
+
+
+#printing stack-trace at exception
+import traceback
+
+    except Exception as e:
+        e.whatever..
+        e.errno
+        e.strerror
+        var = traceback.format_exc()
+
 ```
+
+* Typical Types of Error
+
+
+```python
+except IOError:
+except FileNotFoundError:
+```
+
+### note
 
 * Note its except and not expect
 * No one defines what exceptions will be raised. We handle every possible exception
 * keyword to throw in python is raise
-
-```python
-def function():
-  ...;
-  if problem:
-    raise IOError;
-  ...;
-```
-
-
-Various ways to catch exceptions:
-* This is in python3
-
-```python
-import traceback
-
-except IOError as e:
-  e.whatever..
-  e.errno
-  e.strerror
-  var = traceback.format_exc()
-```
-
-Capture all Exceptions!
-
-```python
-except Exception,e:
-  print str(e)
-```
+    ```python
+    def function():
+      ...;
+      if problem:
+        raise IOError;
+      ...;
+    ```
+* Exception is a grant root of all excetions. So it Capture all Exceptions!
+    ```python
+    except Exception,e:
+        print str(e)
+    ```
+    * As a fallout - if you write a Exception class inherit from Exception
 
 ## Reading file line by line
 
@@ -741,6 +898,10 @@ import fileinput
 for line in fileinput.input():   #this one will pick stdin or if some arg(s) is/are given, it will open that as a file!
   pass
 
+fls=('a.txt','b.txt','-')
+for line in fileinput.input(files=fls):
+  pass
+
 import sys
 for line in sys.stdin:
   print line
@@ -748,7 +909,8 @@ for line in sys.stdin:
 for line_number, line in enumerate(fd):   # will also get line-number along
 ```
 
-enumerate(iterable,start_value=0)         # will start value from start_value
+* Possible exceptions
+    * FileNotFoundError
 
 ### Reading N lines
 
@@ -837,6 +999,7 @@ python -v
 
 ```python
 if __name__ == "__main__":
+    main()
 ```
 
 ## Simple TCP client to send binary info
@@ -915,17 +1078,16 @@ parser.add_argument("str_arg",   help="give a string argument (this is a mandato
 parser.add_argument("int_arg",   help="give a int arg (this is a mandatory argment)", type=int)
 parser.add_argument("optional",  help="User may skip this", nargs="?", default="abc")
 parser.add_argument("many_optional", help="User may give zero or  more of this and this will be a list", nargs="*", default=["a","b"])
+if cmd_options.verbose:
+    print("verbosity turned on")
 
 # dash- is converted to underscore
 
 # COPY THIS for fresh scripts!!
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-v","--verbose", help="increase output verbosity", action="store_true")       # captures if --verbosity present or not in arg-list. No arg per-se for this option.
+    parser.add_argument("server", help="server")
     cmd_options = parser.parse_args()
-    if cmd_options.verbose:
-          print("verbosity turned on")
-
     return cmd_options
 
 also:
@@ -946,6 +1108,21 @@ if len(sys.argv) < 2:
 if not os.path.exists(sys.argv[1]):
     sys.exit('ERROR: Database %s was not found!' % sys.argv[1])
 ```
+
+### nifty use of argparse.Namespace
+
+* Convert dictionary to a object which can access its
+  keys as member-names
+* It wont convert nested dictionaries. Just top-level.
+
+```python
+from argparse import Namespace
+ns = Namespace(**mydict)
+
+#and reverse (this is just pythonic):
+mydict = vars(ns)
+```
+
 
 ## exiting from python
 
@@ -1281,6 +1458,16 @@ dictvar = requests.utils.dict_from_cookiejar(cookiejar)
 cookies = requests.utils.cookiejar_from_dict(dictvar)
 ```
 
+### Post a json object
+
+```python
+url = 'https://api.github.com/some/endpoint'
+payload = {'some': 'data'}
+headers = {'content-type': 'application/json'}
+
+response = requests.post(url, data=json.dumps(payload), headers=headers)
+```
+
 ### To supress warnings
 
 ```python
@@ -1429,6 +1616,32 @@ python -m SimpleHTTPServer 8080
 python3 -m http.server 8080
 ```
 
+### SSL stuff
+
+https://www.electricmonk.nl/log/2018/06/02/ssl-tls-client-certificate-verification-with-python-v3-4-sslcontext/
+https://stackoverflow.com/questions/19705785/python-3-simple-https-server
+
+```py
+from http.server import HTTPServer,SimpleHTTPRequestHandler
+import ssl
+
+server_cert="server.crt"
+server_key="server.key"
+cafiles="site-root.crt"
+
+httpd = HTTPServer(('localhost', 1443), SimpleHTTPRequestHandler)
+
+context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+context.load_cert_chain(certfile=server_cert, keyfile=server_key)
+# these 2 lines are needed only for mutual tls
+context.verify_mode = ssl.CERT_REQUIRED
+context.load_verify_locations(cafile=cafiles)
+httpd.socket = context.wrap_socket (httpd.socket, server_side=True)
+httpd.serve_forever()
+
+```
+
+
 ## pickle
 
 * Just use json instad!
@@ -1476,6 +1689,40 @@ sess_logger.debug("This is a session subsystem log")
 logging.debug("This is fmt - %s and %s", some_object1, some_object2)
 The actual invocation of some_object1.__str__() doesn't happen if debug level is diabled.
 
+* However, if u are calling a function as arg, then you might have to do this:
+
+```
+#lazy_eval
+class lz:
+    def __init__(self, callback, *args, **kwargs):
+        self.callback = callback
+        self.args = args
+        self.kwargs = kwargs
+    def __repr__(self):
+        return repr(self.callback(*self.args, **self.kwargs))
+
+def expensive_function(marg1, oarg1=1, oarg2=2, nmarg1=0, nmarg2=2):
+    print(f'expense {marg1}, {oarg1} {oarg2} {nmarg1} {nmarg2}')
+
+def another_expensive_function():
+    print("expensive")
+
+logging.debug("%r", lz(expensive_function, 5, 6, nmarg1=10) )
+logging.error("%r", lz(expensive_function, 5, 6, nmarg1=10) )
+logging.debug("%r", lz(another_expensive_function))
+logging.error("%r", lz(another_expensive_function))
+```
+
+### syslog
+
+```python
+import syslog
+syslog.openlog(ident="Remote-ssh", logoption=syslog.LOG_PID, facility=syslog.LOG_LOCAL3)
+syslog.syslog(syslog.LOG_INFO, "Done with remote ssh:%d"%sshpid)
+
+```
+
+
 ## Context-manager
 
 ```python
@@ -1487,7 +1734,18 @@ def change_dir_to(new_dir):
   os.chdir(current_dir)
 ```
 
+if your have thing.close() to do post yield:
+```py
+from contextlib import closing
+
+with closing(socket.socket(socket.AF_INET, socket.SOCK_DGRAM)) as s:
+    s.send(...)
+```
+
+
 ## Daemonizing
+
+pip install python-daemon
 
 ```python
 import daemon
@@ -1536,28 +1794,44 @@ def xls_to_csv(infile, outfile):
 ## Json
 
 ```python
-#read a string as json and creates a close python'ish object
-obj = json.loads(str)
+import json
+
+# from file
+with open(json_file, 'r') as fd:
+    obj = json.load(fd)
+# from string
+obj = json.loads(str_var)
 
 #put an arbitrary phttps://pyformat.infoeython object as string
 # Not all built-in python objects are convertible, but not user-defined objects
-str = json.dumps(obj)
+str_var = json.dumps(obj)
 #pretty print json
-str = json.dumps(obj, indent=4, sort_keys=True)
+str_var = json.dumps(obj, indent=4, sort_keys=True)
 
 #for file
 json.dump(obj, fd)
 json.load(fd)
 ```
 
-### Post a json object
+## yaml
+
+* link: https://yaml.readthedocs.io/en/latest/basicuse.html
 
 ```python
-url = 'https://api.github.com/some/endpoint'
-payload = {'some': 'data'}
-headers = {'content-type': 'application/json'}
+import yaml
 
-response = requests.post(url, data=json.dumps(payload), headers=headers)
+# from file
+with open(yaml_file, 'r') as fd:
+    obj = yaml.load(fd)
+# from string
+obj = json.safe_load(str_var)
+pyobj = yaml.load(fd)
+
+# to_string
+#  default_flow_style
+#    False  :  line-breaks used
+#    True   :  dicts,lists are maintained on same line with [],{}
+str_var = yaml.dump(data, default_flow_style=False)
 ```
 
 
@@ -1807,8 +2081,52 @@ s.enter(60, 1, do_something, (s,))
 s.run()
 ```
 
+## ipaddress
+
+```python
+import ipaddress
+
+# a single /32 address
+address = ipaddress.IPv4Address('1.1.1.1')
+# usually decays to str() on representation.
+# you can explicitly cast as well
+str(address)
+
+# a address with its netmask
+interface = ipaddress.IPv4Interface('1.1.1.1/24')
+interface = ipaddress.IPv4Interface('1.1.1.1/255.255.255.0')
+# get network - IPv4Network()
+interface.network
+# get netmask - IPv4Address()
+interface.netmask
+# get just ip - IPv4Address()
+interface.ip
+
+
+# purely a network
+ntwk = ipaddress.IPv4Network('1.1.1.0/24')
+# get just address part - IPv4Address()
+ntwk.network_address
+# get netmask - IPv4Address()
+ntwk.netmask
+
+```
+
+
 ## TunTap interfaces
 
 * snippet is here: https://gist.github.com/abdelrahman-t/a23f57986a40f54108a71d4b91f145b2
 
+## Grpc
 
+### links
+
+https://developers.google.com/protocol-buffers/docs/reference/python-generated?csw=1#fields
+
+### Old style -- without async
+
+* Server
+
+* Client
+
+https://stackoverflow.com/questions/55202617/how-to-make-async-grpc-calls-in-python
