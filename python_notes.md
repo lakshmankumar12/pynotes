@@ -2140,8 +2140,73 @@ ntwk = ipaddress.IPv4Network('1.1.1.0/24')
 ntwk.network_address
 # get netmask - IPv4Address()
 ntwk.netmask
+# prefix
+ntwk.prefixlen
 
 ```
+
+## pyroute2
+
+https://docs.pyroute2.org/iproute.html
+
+```python
+import pyroute2
+ipr = pyroute2.IPRoute()
+
+from pyroute2.netlink.rtnl import ndmsg
+ndmsg.states    ## --> dict of ARP states.
+
+try:
+    any_ipr_command
+except pyroute2.netlink.exceptions.NetlinkError as e:
+    print ("got err:%s", e)
+
+def get_if_index(ipr, ifc_name):
+    ifc_index_list = ipr.link_lookup(ifname=ifc_name)
+    if not ifc_index_list:
+        return None
+    if_index = ifc_index_list[0]
+    return if_index
+
+## ip link show equivalent
+all_ifcs = ipr.get_links()
+### get one atr, eg: mac address:
+all_ifcs[0].get_attr('IFLA_ADDRESS')
+
+## ip link del
+ipr.link("del", index = idx)
+
+## ip link set state up/down
+ipr.link("set", index=if_index, state=state)
+
+## ip addr show dev one_ifc
+exist_ip_infos = ipr.get_addr(index=if_index, family=socket.AF_INET)
+for i in exist_ip_infos:
+    ip_addr = i.get_attr('IFA_ADDRESS')
+    ip_pfx = i['prefixlen']
+## ip addr del <addr/nm> dev ifc
+ipr.addr('del', index=if_index,
+        address=str(i.ip),
+        prefixlen=i.network.prefixlen)
+
+# ip route show table 256
+routes = ipr.get_routes(family=socket.AF_INET,table=MAIN_TABLE_NUM)
+
+# add arp entry (use 'del' for delete)
+ipr.neigh('set',
+        dst=peer_ip,
+        lladdr=peer_mac,
+        ifindex=if_index,
+        state=ndmsg.states['permanent'])
+# get arp entries
+entries = ipr.get_neighbours(ifindex=if_index,
+                match=lambda x:x['state']== ndmsg.states['permanent'])
+
+# get vlans on a ip
+vlans_list = ipr.get_vlans(index=ifidx)
+
+```
+
 
 
 ## TunTap interfaces
