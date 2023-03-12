@@ -695,12 +695,14 @@ await asyncio.sleep(1)
 
 https://docs.python.org/3/library/asyncio-subprocess.html
 
-```py
+```python
+import subprocess
+
 async def run(cmd):
     proc = await asyncio.create_subprocess_shell(
-        cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE)
+                        cmd,
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE)
 
     stdout, stderr = await proc.communicate()
 
@@ -711,6 +713,57 @@ async def run(cmd):
         print(f'[stderr]\n{stderr.decode()}')
 
 asyncio.run(run('ls /zzz'))
+
+
+## regular subprocess
+#### Most quick and useful
+completedProcess=subprocess.run("ls -l /var/log", shell=True, capture_output=True)
+print ("stdout was:%s"%completedProcess.stdout)
+print ("stderr was:%s"%completedProcess.stderr)
+print ("exit code was:%s"%completedProcess.returncode)
+
+# run it natively w/o shell.
+cmd_in_list=['ls', '-l', '/var/log']
+completedProcess=subprocess.run(cmd_in_list, capture_output=True)
+
+# each command is one invocation to Popen, with its stdout/stderr set to the previous commands pipe.
+# You can use subprocess.PIPE to ask popen to give you a pipe. THis is obtained by a call to communicate.
+# the wait will wait till the command is done. errcode is the process return code. 0 if success, non-0 iff ailure
+# The result of communicate is like a string, ready for processing.
+# You can stack as many commands with a pipe arrangement.
+
+# To do this following
+#   ls *.mp3 | grep MS
+from subprocess import Popen, PIPE
+ls_process = Popen(['ls', '*.mp3'], stdout=PIPE)
+grep_process = Popen(['grep', 'ms'],stdin=ls_process.stdout, stdout=PIPE)
+ls_process.stdout.close() # enable write error in ls if grep dies
+out, err = grep_process.communicate()
+
+#if you dont want to pass to stdin
+a=subprocess.Popen(["ls","-l"],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+output,err=a.communicate()
+errcode = a.wait()
+print output
+
+#if you have a  stdin to poass
+a=subprocess.Popen(["ls","-l"],stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+output,err=a.communicate(input="Whatever you want to pass")
+errcode = a.wait()
+print output
+
+
+
+# older versions for py2
+subprocess.call(["ls","-l"])   # Just run it clobbering ur stdout with the cmd's stdout.
+output = subprocess.check_output(["ls","-1"])  # Run and get the o/p as return value
+                                               # But stderr will still clobber your stderr
+
+finished_result=subprocess.run(["ls","-l","file"],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+finished_result=subprocess.run(["ls","-l","file"],...,stdin="some-string")
+finished_result.returncode
+finished_result.stdout
+finished_result.stderr
 ```
 
 
@@ -966,6 +1019,14 @@ def askUser(choices=(1,2,3),max_attempts=5):
             raise Exception
 ```
 
+### password input
+
+```python
+from getpass import getpass
+password = getpass('Optional Prompt:')
+```
+
+
 ### Use readline library
 
 ```python
@@ -1191,7 +1252,7 @@ os.path.isdir('path')   # true if its a dir or a sym link to a dir, -d
 homefolder = os.path.expanduser("~")
 anyfolderunderhome = os.path.expanduser("~/.pyhistory")
 
-# create/make a new dir , mkdir
+# create/make a new dir , mkdir -p
 if not os.path.exists(directory):
     os.makedirs(directory)
 
@@ -1209,25 +1270,8 @@ def copycontents(src,dst):
         shutil.copyfileobj(input, output)
 
 # for quick and directy commands. Command o/p comes to stdout.
+# search : subprocess
 os.system("your command with all args in a single string")
-
-import subprocess
-
-finished_result=subprocess.run(["ls","-l","file"],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-finished_result=subprocess.run(["ls","-l","file"],...,stdin="some-string")
-finished_result.returncode
-finished_result.stdout
-finished_result.stderr
-
-subprocess.run("ls -1",shell=True,check=True)
-completedProcess=subprocess.run(["ls", "-l", "/dev/null"], capture_output=True)
-print ("stdout was:%s"%completedProcess.stdout)
-print ("stderr was:%s"%completedProcess.stderr)
-print ("exit code was:%s"%completedProcess.returncode)
-
-subprocess.call(["ls","-l"])   # Just run it clobbering ur stdout with the cmd's stdout.
-output = subprocess.check_output(["ls","-1"])  # Run and get the o/p as return value
-                                               # But stderr will still clobber your stderr
 
 boolean_variable=os.access("/path/to/file",os.F_OK)  # does file exist at all
 boolean_variable=os.access("/path/to/file",os.R_OK)
@@ -1264,33 +1308,6 @@ import fnmatch
 [ name for name in os.listdir(given_dir) if fnmatch.fnmatch(name, '*.txt') ]
 
 or
-
-#if you dont want to pass to stdin
-a=subprocess.Popen(["ls","-l"],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-output,err=a.communicate()
-errcode = a.wait()
-print output
-
-#if you have a  stdin to poass
-output,err=a.communicate('Any string as in input if needed')
-a=subprocess.Popen(["ls","-l"],stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-output,err=a.communicate(input="Whatever you want to pass")
-errcode = a.wait()
-print output
-
-# each command is one invocation to Popen, with its stdout/stderr set to the previous commands pipe.
-# You can use subprocess.PIPE to ask popen to give you a pipe. THis is obtained by a call to communicate.
-# the wait will wait till the command is done. errcode is the process return code. 0 if success, non-0 iff ailure
-# The result of communicate is like a string, ready for processing.
-# You can stack as many commands with a pipe arrangement.
-
-# To do this following
-#   ls *.mp3 | grep MS
-from subprocess import Popen, PIPE
-ls_process = Popen(['ls', '*.mp3'], stdout=PIPE)
-grep_process = Popen(['grep', 'ms'],stdin=ls_process.stdout, stdout=PIPE)
-ls_process.stdout.close() # enable write error in ls if grep dies
-out, err = grep_process.communicate()
 
 import glob
 list_of_filenames=glob.glob("*.py")
@@ -1386,6 +1403,10 @@ datetime.datetime.strftime('format')                    # print a time in a stri
 
 %s - get seconds since epcoh #Undocumented. Might work or not.
 
+## initialize from epoch
+datetime.datetime.fromtimestamp(123132112)
+datetime.datetime.fromtimestamp(0)           # initialize from 0-epoch.
+
 datetime.timedelta is returned when you subtract 2 datetime.datetime objects
 
 date = datetime_obj + datetime.timedelta(days=30)
@@ -1401,6 +1422,16 @@ time.mktime(datetime.datetime.now().timetuple())
 
  eg: linux date o/p , and its string format
      a=datetime.datetime.strptime("Mon Dec 11 20:08:01 UTC 2017","%a %b %d %H:%M:%S %Z %Y")
+
+##timedetla in days, hours, minutes, seconds
+def days_hours_minutes(td):
+    return td.days, td.seconds//3600, (td.seconds//60)%60, td.seconds%60
+## initialize timedelta
+datetime.timedelta(days=10)
+datetime.timedelta(seconds=3600)
+datetime.timedelta(minutes=15)
+datetime.timedelta(hours=3)
+
 ```
 
 ## Enums /enum
