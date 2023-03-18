@@ -232,6 +232,20 @@ tree = lambda: defaultdict(tree)
 my_holder = tree()
 ```
 
+### Comparison
+
+* simple == does work. BUt will give False at the slightest difference.
+* It might raise ValueError if there are say numpy arrays.
+* Use `DeepDiff`
+```python
+from deepdiff import DeepDiff
+
+diff = DeepDiff(a, b)
+## diff is a dict with differences.
+## diff is empty-{} if there are no diffs.
+```
+
+
 ## strings
 
 ### Literals
