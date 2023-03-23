@@ -343,6 +343,35 @@ a.decode('ascii')    # gives a string object.
 bytes like string is immutable
 bytearray is mutuable
 
+### various convertsions
+
+```python
+# byte to hexstr
+b=b'\x64\x84abc'
+hexstr=b.hex()
+
+# hexstr to byte
+h='1234567890abcdef'
+b=bytes.fromhex(h)
+
+# hexstr to one int
+int('0xdeadbeef',0) # auto-inferred base from 0x
+int('deadbeef',16)
+int('0xdeadbeef',16)
+int('12312',0)      # auto-inferred base
+int('12312',10)
+
+#bytes to intarray -- just use list comprehesion
+b=b'\x64\x84abc'
+arr=list((i for i in b))
+
+#bytes to int
+byte_val=b'\x00\x01'
+int_val = int.from_bytes(byte_val,"big")
+
+```
+
+
 ## Extra Extended Datatypes from Collections
 
 * collections.deque
@@ -2187,6 +2216,9 @@ all_ifcs = ipr.get_links()
 ### get one atr, eg: mac address:
 all_ifcs[0].get_attr('IFLA_ADDRESS')
 
+## one line show
+ipr.link("get", index = idx)
+
 ## ip link del
 ipr.link("del", index = idx)
 
@@ -2240,3 +2272,26 @@ https://developers.google.com/protocol-buffers/docs/reference/python-generated?c
 * Client
 
 https://stackoverflow.com/questions/55202617/how-to-make-async-grpc-calls-in-python
+
+## protobuf
+
+```python
+
+# importing a .proto file and its data-strutures
+from lte.protos.policydb_pb2 import FlowDescription, FlowMatch, PolicyRule
+
+# using a enum value
+## proto def:
+##  enum Test {
+##    ONE = 1;
+##    TWO = 2;
+##  }
+file_pb2.Test.Name(1)
+file_pb2.Test.Value('One')
+
+## assign to enum as if they are ints
+a=file_pb2.MessageHavingEnum()
+a.enum_field = 1
+
+```
+
