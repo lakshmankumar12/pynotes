@@ -364,10 +364,16 @@ int('12312',10)
 #bytes to intarray -- just use list comprehesion
 b=b'\x64\x84abc'
 arr=list((i for i in b))
+#intarray to bytes
+intarr = [ 1, 2, 3 ]
+b = bytes(intarr)
 
 #bytes to int
 byte_val=b'\x00\x01'
 int_val = int.from_bytes(byte_val,"big")
+#int to bytes
+int_val = 5
+b = int_val.to_bytes(2, 'big')  # first arg is size of output
 
 ```
 
