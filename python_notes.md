@@ -1450,7 +1450,7 @@ datetime.datetime.strftime('format')                    # print a time in a stri
 %b - 3 alpha month
 %Z - time-zone
 
-%s - get seconds since epcoh #Undocumented. Might work or not.
+%s - get seconds since epoch #Undocumented. Might work or not.
 
 ## initialize from epoch
 datetime.datetime.fromtimestamp(123132112)
@@ -1468,6 +1468,7 @@ datetime_object.date()
 
 #to get time in seconds since epoch
 time.mktime(datetime.datetime.now().timetuple())
+now = int(time.time())
 
  eg: linux date o/p , and its string format
      a=datetime.datetime.strptime("Mon Dec 11 20:08:01 UTC 2017","%a %b %d %H:%M:%S %Z %Y")
