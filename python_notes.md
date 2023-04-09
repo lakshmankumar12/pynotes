@@ -730,6 +730,20 @@ itertools.cycle(iterable)                       -> keeps cycling on the iterable
 reversed(iterable)                              -> native way to reverse any interable
 ```
 
+## namedtuple
+
+```python
+from collections import namedtuple
+
+# Declaring namedtuple()
+Student = namedtuple('Student', ['name', 'age', 'DOB'])
+
+# Adding values
+S = Student('Adam', '19', '2541997')
+
+```
+
+
 # asyncio
 
 ## common asyncio statements
@@ -1466,9 +1480,22 @@ datetime.datetime(2019, 1, 19)
 #convert datetime to date
 datetime_object.date()
 
-#to get time in seconds since epoch
-time.mktime(datetime.datetime.now().timetuple())
+#to get time in seconds since epoch or from a datetime
 now = int(time.time())
+now = datetime.datetime.now().timestamp()
+
+## convert a datetimte to timezone aware
+import pytz
+unaware = datetime.datetime(2011, 8, 15, 8, 15, 12, 0)
+aware = datetime.datetime(2011, 8, 15, 8, 15, 12, 0, pytz.UTC)
+now_aware = pytz.utc.localize(unaware)
+assert aware == now_aware
+
+## for utc (any tz w/o daylight savings)
+aware = unaware.replace(tzinfo=pytz.UTC)
+
+#python < 3.3
+#time.mktime(datetime.datetime.now().timetuple())
 
  eg: linux date o/p , and its string format
      a=datetime.datetime.strptime("Mon Dec 11 20:08:01 UTC 2017","%a %b %d %H:%M:%S %Z %Y")
