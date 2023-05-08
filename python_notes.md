@@ -741,15 +741,22 @@ Student = namedtuple('Student', ['name', 'age', 'DOB'])
 # Adding values
 S = Student('Adam', '19', '2541997')
 
+#for editable types, but only creates direct objects .. not types
+from types import SimpleNamespace
+
+t = SimpleNamespace(member1='value1',member2='value2')
+
 ```
 
 
-# asyncio
+## asyncio
 
-## common asyncio statements
+### common asyncio statements
 
 ```py
 await asyncio.sleep(1)
+
+loop.call_soon_threadsafe(function, arg1, arg2, argN)
 
 ```
 
@@ -768,6 +775,7 @@ async def run(cmd):
                         stderr=asyncio.subprocess.PIPE)
 
     stdout, stderr = await proc.communicate()
+    returncode = proc.returncode
 
     print(f'[{cmd!r} exited with {proc.returncode}]')
     if stdout:
@@ -1463,6 +1471,7 @@ datetime.datetime.strftime('format')                    # print a time in a stri
 %a - 3 alpha weekday
 %b - 3 alpha month
 %Z - time-zone
+## what you mostly want - %Y-%m-%d-%H-%M-%S
 
 %s - get seconds since epoch #Undocumented. Might work or not.
 
