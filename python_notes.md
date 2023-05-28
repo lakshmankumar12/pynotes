@@ -837,6 +837,18 @@ finished_result.stdout
 finished_result.stderr
 ```
 
+## pylint
+
+```sh
+# to invoke pylint
+pylint your_script.py
+
+# generate rc file
+pylint --generate-rcfile > .pylintrc
+# edit good-names
+
+```
+
 
 
 # Python Internals
@@ -1122,6 +1134,19 @@ if os.path.exists(historyPath):
 
 atexit.register(save_history)
 ```
+
+## dump history of python interactive console
+
+```python
+import readline; print('\n'.join([str(readline.get_history_item(i + 1)) for i in range(readline.get_current_history_length())]))
+## what the above does?
+##   import readline;
+##   print('\n'.join(
+##         [ str(readline.get_history_item(i + 1))
+##             for i in range(readline.get_current_history_length())
+##         ]))
+```
+
 
 ## Find python version
 
@@ -1840,15 +1865,26 @@ syslog.syslog(syslog.LOG_INFO, "Done with remote ssh:%d"%sshpid)
 ```
 
 
-## Context-manager
+## context-manager
 
 ```python
+
+from contextlib import contextmanager
 @contextmanager
 def change_dir_to(new_dir):
   current_dir = os.getcwd()
   os.chdir(new_dir)
   yield
   os.chdir(current_dir)
+
+## wrapping over a with
+@contextmanager
+def print_fd(opts):
+    if opts.outfile:
+        with open(opts.outfile, "w") as fd:
+            yield fd
+    else:
+        yield sys.stdout
 ```
 
 if your have thing.close() to do post yield:
