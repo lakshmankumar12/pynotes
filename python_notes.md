@@ -97,9 +97,19 @@ Sorting a list
 * list.sort()
     * sorts the list in place. So better than sorted(list) if u dont need orig-list.
     * sorted() takes any iterable, but list.sort() is available only for lists.
-* Both sorted and list.sort() take a named key arg. This is a function with one-arg and returns
-  a value, which is used as the value to be sorted. (Efficient as this func is called
-  only once for each member). Lambda's are typically used here..
+* Customer sorting
+    ```python
+    l = [6, 8, 10, 23, -4, -7]
+    # The cmp parameter HAS BEEN REMOVED in Python 3
+    sorted_l = sorted(l, cmp=lambda x, y: x ** 3 - y ** 3) # Sort with cmp
+    sorted_l = sorted(l, key=lambda x: x ** 3)             # Sort with key
+
+    ## python3 has key=functools.cmp_to_key(cmp_func) .. to use as a last resort
+    ```
+    * Both sorted and list.sort() take a named key arg. This is a function with one-arg and returns
+      a value, which is used as the value to be sorted. (Efficient as this func is called
+      only once for each member). Lambda's are typically used here..
+    * see https://learnpython.com/blog/python-custom-sort-function/
 
 ### List comprehesion
 
@@ -111,8 +121,38 @@ Sorting a list
 * so is it with dictionary and set comprehesion
 
 ```python
-{ expression_with_i:another_expression_with_i for i in a_list if condition }
+# dict comprehension uses {} and :
+newdict = { expression_with_i:another_expression_with_i for i in iterable }
+# set just uses the {}
+newset = { expression_with_i for i in iterable if condition }
 ```
+
+### iteration in general
+
+```python
+
+for i in list_var:
+    whatever(i)
+
+# iterate in groups of 2
+for x,y in zip(*[iter(iterable)]*2):
+    whatever(x,y)
+
+```
+
+
+
+### slice
+
+```
+## first is included. Last is not include.
+iterable[first:last:step]
+
+## smart way to reverse
+list_var[::-1]
+
+```
+
 
 
 ## Tuples
@@ -226,6 +266,9 @@ orig_dict.update(another_dict)
 >>> d.items()
 [('blue', [2, 4]), ('red', [1]), ('yellow', [1, 3])]
 
+## To create defaultdict with some constant values:
+>>> d = defaultdict(lambda: 'initial')
+
 #arbitrary level of nested default-dicts!
 #Note the last leve will also be a default-dict, but this is okay and can be ignored - just handle keys
 tree = lambda: defaultdict(tree)
@@ -259,6 +302,7 @@ diff = DeepDiff(a, b)
 a = '''This is a multiline
        preserving line-breaks and initial spaces'''
 
+# search: long multi-line string literal
 # multiline just in code
 # Note there is N-O comma between them
 a = ("this is a convenient"
@@ -585,6 +629,55 @@ id(anyobject)  # gives a unique id for th object
 
 ```
 
+### operator overloading for classes
+
+```python
+class MyClass:
+    def __eq__(self, other):
+        """Overrides the default implementation"""
+        if isinstance(other, MyClass):
+            return self.member1 == other.member1
+        return False
+
+    def __hash__(self):
+        return self.hash_of_my_members()
+
+    ## __hash__ and __eq__ is needed to participate as key in set/dict
+
+    ## only method needed to be sortable
+    def __lt__(self, other):
+        return True  # or false
+
+```
+
+### class methods by reference
+
+
+```python
+
+class C:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def m(self, x):
+        print(f"{self.name} called with param '{x}'")
+        return
+
+ci = C("Joe", 10)
+print(C)               ## <class 'test.C'>
+print(ci)              ## <test.C object at 0x7f22d9462f20>
+print(C.m)             ## <function C.m at 0x7f22d9351870>
+print(ci.m)            ## <bound method C.m of <test.C object at 0x7f22d9462f20>>
+print(getattr(ci,'m')) ## <bound method C.m of <test.C object at 0x7f22d9462f20>>
+                       ## notice the bound-method difference
+                       ## so, self gets automatically passed
+getattr(ci,'m')('arg') ## Joe called with param 'arg'
+```
+
+
+
+
 
 ## Global scope
 
@@ -739,7 +832,9 @@ from collections import namedtuple
 Student = namedtuple('Student', ['name', 'age', 'DOB'])
 
 # Adding values
-S = Student('Adam', '19', '2541997')
+S = Student('Adam', 19, '2541997')
+# you can do it by name too
+s = Student(name="Adam", age=19, DOB='2541997')
 
 #for editable types, but only creates direct objects .. not types
 from types import SimpleNamespace
@@ -757,6 +852,10 @@ t = SimpleNamespace(member1='value1',member2='value2')
 await asyncio.sleep(1)
 
 loop.call_soon_threadsafe(function, arg1, arg2, argN)
+
+loop.call_at(loop.time()+1, async_func, arg1, arg2)
+
+loop.run_forever()
 
 ```
 
@@ -1069,6 +1168,8 @@ with open(filename) as f:
 
 ## To find if a variable is a list/scalar
 
+search: type
+
 ```python
 if isinstance(var_name, list):
 ```
@@ -1215,6 +1316,14 @@ def handler(signum, frame):
 signal.signal(signal.SIGALRM, handler)
 ```
 
+# run python 2.7
+
+```sh
+## say you have a ./verify.py in your PWD, run it like this
+docker run --rm -it -v $PWD:/host python:2.7.18-slim-stretch python '-c' 'import os;os.chdir("/host");import verify'
+
+```
+
 
 # Various Python Libraries
 
@@ -1230,7 +1339,7 @@ parser.add_argument("-v","--verbose", help="increase output verbosity", type=int
 parser.add_argument("-v","--verbose", help="increase output verbosity", type=float)                  # --verbosity <int>
 parser.add_argument("-v","--verbose", help="increase output verbosity", type=int, choices=[0,1,2]) # --verbosity <0|1|2>
 parser.add_argument("-l","--long-arg", help="repeats", nargs="+", required=True)                   # -l arg1 arg2 arg3  .. flipside: cant distinguish positional args from args to this option
-parser.add_argument("-L","--long-arg2", help="repeats", type="append")                             # -l arg1 -l arg2 -l arg3 .. better.
+parser.add_argument("-L","--long-arg2", help="repeats", action="append")                             # -l arg1 -l arg2 -l arg3 .. better.
 parser.add_argument("str_arg",   help="give a string argument (this is a mandatory argment)")
 parser.add_argument("int_arg",   help="give a int arg (this is a mandatory argment)", type=int)
 parser.add_argument("optional",  help="User may skip this", nargs="?", default="abc")
@@ -1243,7 +1352,7 @@ if cmd_options.verbose:
 # COPY THIS for fresh scripts!!
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("server", help="server")
+    parser.add_argument("file", help="input file")
     cmd_options = parser.parse_args()
     return cmd_options
 
@@ -1496,7 +1605,10 @@ datetime.datetime.strftime('format')                    # print a time in a stri
 %a - 3 alpha weekday
 %b - 3 alpha month
 %Z - time-zone
+%f - (may not be supported) .. milliseconds
 ## what you mostly want - %Y-%m-%d-%H-%M-%S
+
+datetime.isoformat() # gives: 2022-03-16T04:51:27+00:00
 
 %s - get seconds since epoch #Undocumented. Might work or not.
 
@@ -1525,8 +1637,8 @@ aware = datetime.datetime(2011, 8, 15, 8, 15, 12, 0, pytz.UTC)
 now_aware = pytz.utc.localize(unaware)
 assert aware == now_aware
 
-## for utc (any tz w/o daylight savings)
-aware = unaware.replace(tzinfo=pytz.UTC)
+##or
+datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
 
 #python < 3.3
 #time.mktime(datetime.datetime.now().timetuple())
@@ -1542,6 +1654,8 @@ datetime.timedelta(days=10)
 datetime.timedelta(seconds=3600)
 datetime.timedelta(minutes=15)
 datetime.timedelta(hours=3)
+
+str(datetime.timedelta(..))  # will neatly convert to HH:MM:SS format
 
 ```
 
@@ -1672,23 +1786,43 @@ Tag, NavigableString, BeautifulSoup, and Comment.
 
 ## XML/xml
 
-Element:
-    * tag - name
-    * attribue - name/value paris
-    * context - text
-    * can have subelements to any depth
-    * xml can have only one root.
+lxml is the popular library for xml
+
+It has 2 important data-structures
+* ElementTree
+    * represents the whole tree
+    * `et.getroot()` gets the root element of the tree
+    * has find/search apis.. to document.
+* Element:
+    * `tag` - name
+    * `attribute` - dict of name/value pairs
+    * `text` - content of the element
+    * can have subelements to any depth. These are direct iterables
+      of the element.
 
 ```python
-import xml.etree.ElementTree as etree
-tree = etree.parse('file_having_xml.xml')
-root = tree.get_root()  # root if of type Element
+import lxml.etree as etree
+
+## load a xml file as ElementTree
+x = etree.parse(filename, parser=etree.XMLParser(remove_comments=True))
+
+## print xml elems in a single line (demos the recursive walking of the xml)
+def print_xml(stack, element):
+    stack.append(element.tag)
+    if len(element):
+        for child in element:
+            print_xml(stack, child)
+    else:
+        print("%s = %s"%('/'.join(stack),element.text))
+    stack.pop()
+
+first_element = x.getroot()
+stack=[]
+print_xml(stack, first_element)
+
 ```
 
-* element.tag is its tag
-* children are lists. This way element is an iterable
-* element.attrib is a dict
-* element.txt is its content
+* More samples
 
 ```python
 import lxml.etree
@@ -1703,6 +1837,10 @@ for i in all_a:
 
 lxml.etree.tostring(element)
 
+```
+* Another library?
+
+```python
 import xml.dom.minidom
 xml.dom.minidom.parseString(lxml.etree.tostring(mytree)).toprettyxml()
 ```
@@ -1762,8 +1900,12 @@ python3 -m http.server 8080
 
 https://www.electricmonk.nl/log/2018/06/02/ssl-tls-client-certificate-verification-with-python-v3-4-sslcontext/
 https://stackoverflow.com/questions/19705785/python-3-simple-https-server
+https://snyk.io/advisor/python/wsgiref/functions/wsgiref.simple_server.WSGIServer
+https://stackoverflow.com/questions/13613336/how-do-i-concatenate-text-files-in-python
+https://www.cmi.ac.in/~madhavan/courses/prog2-2012/docs/python-3.2.1-docs-html/library/ssl.html#ssl.SSLContext.wrap_socketo
+https://stackoverflow.com/questions/66797589/reload-aiohttp-ssl-certificates
 
-```py
+```python
 from http.server import HTTPServer,SimpleHTTPRequestHandler
 import ssl
 
@@ -1773,6 +1915,8 @@ cafiles="site-root.crt"
 
 httpd = HTTPServer(('localhost', 1443), SimpleHTTPRequestHandler)
 
+# not that its client-auth, although we create a service-side socket.
+# apparently, this is for 'for-client-to-authorize-us'
 context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 context.load_cert_chain(certfile=server_cert, keyfile=server_key)
 # these 2 lines are needed only for mutual tls
@@ -1815,6 +1959,11 @@ import logging
 logging.basicConfig(filename="abc.log", level=logging.DEBUG)
 # mode='w', will erase existing log file
 # DEBUG, INFO, WARNING, ERROR, CRITICAL, FATAL
+# to set format options:
+logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s',
+                    level=logging.INFO,
+                    datefmt='%Y-%m-%d %H:%M:%S')
+https://docs.python.org/3/library/logging.html#logrecord-attributes
 
 logging.debug("This is a debug message")
 
@@ -1854,6 +2003,39 @@ logging.error("%r", lz(expensive_function, 5, 6, nmarg1=10) )
 logging.debug("%r", lz(another_expensive_function))
 logging.error("%r", lz(another_expensive_function))
 ```
+
+### rotating handling
+
+```python
+
+import logging
+import logging.handlers
+import gzip
+import shutil
+
+def gzip_rotator(source, dest):
+    with open(source, 'rb') as f_in, gzip.open(dest, 'wb') as f_out:
+        shutil.copyfileobj(f_in, f_out)
+    os.remove(source)
+
+def gzip_namer(name):
+    return name + ".gz"
+
+log_handler = logging.handlers.RotatingFileHandler(options.logfile,
+                            maxBytes=5000000, backupCount=10)
+formatter = logging.Formatter('%(asctime)s %(process)d %(levelname)s %(message)s')
+formatter.converter = time.gmtime
+log_handler.setFormatter(formatter)
+log_handler.rotator = gzip_rotator
+log_handler.namer = gzip_namer
+logger = logging.getLogger()
+logger.addHandler(log_handler)
+logger.setLevel(level)
+
+
+
+```
+
 
 ### syslog
 
@@ -1944,7 +2126,7 @@ def xls_to_csv(infile, outfile):
 
 ```
 
-## Json
+## json
 
 ```python
 import json
@@ -2338,7 +2520,7 @@ vlans_list = ipr.get_vlans(index=ifidx)
 
 * snippet is here: https://gist.github.com/abdelrahman-t/a23f57986a40f54108a71d4b91f145b2
 
-## Grpc
+## grpc
 
 ### links
 
@@ -2349,6 +2531,34 @@ https://developers.google.com/protocol-buffers/docs/reference/python-generated?c
 * Server
 
 * Client
+
+```python
+
+try:
+    # Make a gRPC call that may result in a timeout
+    response = tgt_client.MessageType(request, timeout=10) 
+except grpc.RpcError as e:
+    if isinstance(e, grpc.FutureTimeoutError):
+        # Handle timeout error
+        print("gRPC timeout error occurred.")
+    else:
+        # Handle other gRPC errors
+        print("An error occurred:", e)
+
+## old async way
+feature_future = stub.GetFeature.future(point)
+
+# later:
+feature = feature_future.result()
+# or
+def process_response(future):
+    result = future.result()
+feature_future.add_done_callback(process_response)
+
+```
+
+
+### with async
 
 https://stackoverflow.com/questions/55202617/how-to-make-async-grpc-calls-in-python
 
@@ -2371,6 +2581,13 @@ file_pb2.Test.Value('One')
 ## assign to enum as if they are ints
 a=file_pb2.MessageHavingEnum()
 a.enum_field = 1
+
+#struct types
+from google.protobuf.struct_pb2 import Struct
+s=Struct()
+# just assign directly a int, bool, string, none, list or another struct
+s['shell_params'] = ['-c "echo happy"',]
+
 
 ```
 
