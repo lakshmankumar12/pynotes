@@ -823,6 +823,17 @@ itertools.cycle(iterable)                       -> keeps cycling on the iterable
 reversed(iterable)                              -> native way to reverse any interable
 ```
 
+## copy
+
+```python
+from copy import deepcopy
+
+some_dict = {}  #or list or list of list ,whatever
+copy_dict = deepcopy(some_dict)
+
+```
+
+
 ## namedtuple
 
 ```python
