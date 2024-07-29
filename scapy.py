@@ -71,7 +71,17 @@ reply=sr1(a)
 
 
 #import a pcap file
-a=rdpcap("/path/to/file.cap")
+for pkt in PcapReader('new.pcap'):
+    eth_src = pkt[Ether].src
+    eth_type = pkt[Ether].type
+    if [...]
+
+## less efficient.. reads whole file to memory
+pkts=rdpcap("/path/to/file.cap")
+for pkt in pkts:
+    eth_src = pkt[Ether].src 
+    eth_type = pkt[Ether].type
+    if [...]
 
 #Not scapy but general ip functions
 def carry_around_add(a, b):

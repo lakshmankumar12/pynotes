@@ -308,7 +308,18 @@ a = '''This is a multiline
 a = ("this is a convenient"
      " way to code a lengthy string"
      " without newlines or initial spaces")
+
+## works for f-strings too
+a = (f"first string {var1}"
+     f" continue string {var2}")
 ```
+
+* useful python definitions
+
+```python
+from string import ascii_letters
+```
+
 
 
 ### notes
@@ -473,8 +484,8 @@ continue
 
 # use this to get a convenient index as well
 # you can override start value as well.
-for n,i in enumerate(iterable,start_value=0):
-    do_whatever(n,i)
+for n,item_in_iterable in enumerate(iterable,start_value=0):
+    do_whatever(n,item_in_iterable)
 
 #limit for loop to a number
 for i in itertools.slice(iter,0,limit):
@@ -852,6 +863,21 @@ from types import SimpleNamespace
 
 t = SimpleNamespace(member1='value1',member2='value2')
 
+from dataclasses import dataclass
+
+## leverages typing
+@dataclass
+class Student:
+    name: str
+    age: int
+    rating: float
+
+@dataclass
+class FsmState:
+    name: str
+    run: Callable
+    next_state: Dict[str, str]
+
 ```
 
 
@@ -862,11 +888,14 @@ t = SimpleNamespace(member1='value1',member2='value2')
 ```py
 await asyncio.sleep(1)
 
-loop.call_soon_threadsafe(function, arg1, arg2, argN)
+loop.call_soon_threadsafe(non_async_function, arg1, arg2, argN)
+loop.create_task(async_function(arg1, arg2, argN))  #note the way args are passed
 
 loop.call_at(loop.time()+1, async_func, arg1, arg2)
 
 loop.run_forever()
+
+loop = asyncio.new_event_loop()
 
 ```
 
@@ -959,6 +988,25 @@ pylint --generate-rcfile > .pylintrc
 
 ```
 
+## struct pack
+
+https://docs.python.org/3/library/struct.html
+
+```python
+# ?: boolean
+# b B: signed/unsigned char
+# h H: signed/unsigned short
+# i I: signed/unsigned int
+# l L: signed/unsigned long
+# q Q: signed/unsigned long long int
+# n N: ssize_t size_t
+# f: float
+# d: double
+# s: char[]
+# P: void*
+```
+
+
 
 
 # Python Internals
@@ -996,6 +1044,20 @@ pip freeze
 
 #list all files installed in a package
 pip show -f <package>
+
+#force install agian
+pip install --ignore-installed package
+
+#force upgrade
+pip install --upgrade --force-reinstall <package>
+
+#get logs
+pip install package --log LOGFILE
+
+#onlydownload
+pip3 download --no-deps --no-build-isolation <package>
+## and install from package
+pip3 install path/to/downloaded/tar/or/whl/file
 ```
 
 ## Python Interpreter notes
@@ -1039,6 +1101,16 @@ sys.stdout.flush()  # in python 2
 print('string',file=sys.stdout)  # to a file
 ```
 
+## long line in source code
+
+search: lenghty break
+
+```python
+a = ("This is the first line of my text, "
+     "which will be joined to a second.")
+```
+
+
 ## formating
 
 https://pyformat.info/
@@ -1057,6 +1129,17 @@ string.format(args)
 ```python
 {<arg-position><convertion-flag>:<padding-char><align><width>.<trunc-width><type>}  # default type is string
 ```
+
+### f-strings
+
+```sh
+
+f'string with pyexpression in it {dictname["key"]} and {varname}. Note var is also expr'
+
+f'expr={expr}' can be conveniently written as f'{expr=}'
+
+```
+
 
 ## print function for v2
 
@@ -1125,6 +1208,20 @@ except FileNotFoundError:
     ```
     * As a fallout - if you write a Exception class inherit from Exception
 
+### custom exception
+
+```python
+class ValidationError(Exception):
+    def __init__(self, message, errors):
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+        # Now for your custom code...
+        self.errors = errors
+
+```
+
+
 ## Reading file line by line
 
 
@@ -1190,10 +1287,10 @@ if isinstance(var_name, list):
 ```python
 #what you probably need most of the time
 variable=raw_input("Prompt string w/o newline:") # Gets whatever is given and assigns to variable which is now a str. You then cast this string into whatever you want.
-
 # in python3, raw_input is input
+variable=raw_input("Prompt string w/o newline:") # Gets whatever is given and assigns to variable which is now a str. You then cast this string into whatever you want.
 
-#also know:
+# only in python2:
 variable=input("Prompt string w/o newline:")     # Gets user-input and interprets it as a python-expression! Thus unquoted string-literals are interpreted as var-names
                                                  # Most likely not what you want. But if you type in a int, your variable also holds a int-object directly.
 
@@ -1335,6 +1432,37 @@ docker run --rm -it -v $PWD:/host python:2.7.18-slim-stretch python '-c' 'import
 
 ```
 
+# jinja templates
+
+```python
+
+#test for length of list or dict
+#for loop on a list
+'''
+  {% if (cbsd_altIds is defined) and cbsd_altIds|length > 0 %}
+  "alternateCbsdIds": [
+    {% for data in cbsd_altIds %}
+    "{{data}}"{{ "," if not loop.last }}
+    {% endfor %}
+  ],
+  {% endif %}
+'''
+
+#member in dict
+'''
+    {% if 'cbsdId' in regdereg %}
+        "cbsdId": "{{regdereg.cbsdId}}",
+    {% endif %}
+'''
+# simpler
+'''
+    "cell_id": {{ eb.cellid if 'cellid' in eb else 1 }},
+'''
+
+
+```
+
+
 
 # Various Python Libraries
 
@@ -1408,6 +1536,7 @@ sys.exit(0)
 ## environment variables
 
 os.environ['HOME']
+os.getenv("CHOICE_OF_SUB", 'default_value')
 
 ## regular expression  regexp regex
 
@@ -1463,6 +1592,10 @@ os.path.dirname(os.path.realpath(__file__))   # get dir of current file
 os.path.isfile('path')  # true if its regular file or sym-link to regular file, if [ -f file ] check in sh
 os.path.islink('path')  # true if its a sym link
 os.path.isdir('path')   # true if its a dir or a sym link to a dir, -d
+
+## touch a file
+from pathlib import Path
+Path('/path/to/file').touch
 
 #get home folder
 homefolder = os.path.expanduser("~")
@@ -1641,6 +1774,10 @@ datetime_object.date()
 now = int(time.time())
 now = datetime.datetime.now().timestamp()
 
+## guess from any date string
+import dateutil.parser
+yourdate = dateutil.parser.parse(datestring)
+
 ## convert a datetimte to timezone aware
 import pytz
 unaware = datetime.datetime(2011, 8, 15, 8, 15, 12, 0)
@@ -1648,8 +1785,19 @@ aware = datetime.datetime(2011, 8, 15, 8, 15, 12, 0, pytz.UTC)
 now_aware = pytz.utc.localize(unaware)
 assert aware == now_aware
 
+## some other zone
+aware = pytz.timezone('Asia/Kolkata').localize(unaware)
+## get list of zones
+pytz.country_timezones.keys
+pytz.country_timezones['IN']
+## or from shell
+timedatectl list-timezones
+
 ##or
 datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
+
+## view a datetime in antoher timezone
+aware_datetime.astimezone(pytz.UTC)
 
 #python < 3.3
 #time.mktime(datetime.datetime.now().timetuple())
@@ -1667,6 +1815,7 @@ datetime.timedelta(minutes=15)
 datetime.timedelta(hours=3)
 
 str(datetime.timedelta(..))  # will neatly convert to HH:MM:SS format
+
 
 ```
 
@@ -2457,6 +2606,8 @@ ntwk.network_address
 ntwk.netmask
 # prefix
 ntwk.prefixlen
+# broadcast address
+ntwk.broadcast_address
 
 ```
 
@@ -2530,6 +2681,7 @@ vlans_list = ipr.get_vlans(index=ifidx)
 ## TunTap interfaces
 
 * snippet is here: https://gist.github.com/abdelrahman-t/a23f57986a40f54108a71d4b91f145b2
+* (my fork) - https://gist.github.com/lakshmankumar12/028cc98875994963e781e4e6d120f0b3
 
 ## grpc
 
@@ -2586,11 +2738,14 @@ from lte.protos.policydb_pb2 import FlowDescription, FlowMatch, PolicyRule
 ##    ONE = 1;
 ##    TWO = 2;
 ##  }
+## simply refer by name
+file_pb2.Test.ONE
 file_pb2.Test.Name(1)
 file_pb2.Test.Value('One')
 
-## assign to enum as if they are ints
 a=file_pb2.MessageHavingEnum()
+a.enum_field = file_pb2.Test.ONE
+## or assign to enum as if they are ints
 a.enum_field = 1
 
 #struct types
@@ -2599,6 +2754,116 @@ s=Struct()
 # just assign directly a int, bool, string, none, list or another struct
 s['shell_params'] = ['-c "echo happy"',]
 
+## copying structs
+## search - Assignment not allowed to composite field in protocol message
+outer.inner.CopyFrom(another_inner)
+
+## add to a list
+outer.append()
 
 ```
+
+
+## tracemalloc
+
+
+* https://docs.python.org/3/library/tracemalloc.html
+
+```python
+import tracemalloc
+
+tracemalloc.start()
+
+# ... run your application ...
+
+snapshot = tracemalloc.take_snapshot()
+top_stats = snapshot.statistics('lineno')
+
+print("[ Top 10 ]")
+for stat in top_stats[:10]:
+    print(stat)
+```
+
+## pytest
+
+```python
+
+## simplest is to write a function that is test_whatever()
+## anything that starts with test_ will be run when you run this file under the pymoule
+##
+###   yourproject
+##       |
+##       +--- src
+##       |     |
+##       |     +-- adder.py   <-- say has a def add:
+##       |
+##       +--- tests
+##       |     |
+##       |     +-- test_adder.py   <-- say has a def test_add:
+
+##
+## run all tests
+##           python -m pytest tests
+##
+## run single test file
+##           python -m pytest tests/test_adder.py
+##
+## run single test case
+##           python -m pytest tests/test_calc.py::test_add
+
+```
+
+* parameterizing
+
+```python
+
+import pytest
+from src.calc import add
+
+
+@pytest.mark.parametrize("a,b,expected",
+                            [(10, 5, 15),
+                            (-1, 1, 0),
+                            (-1, -1, -2)])
+def test_add(a, b, expected):
+    assert add(a, b) == expected
+
+```
+
+* fixtures
+
+```python
+## see https://stackoverflow.com/questions/46089480/pytest-fixtures-redefining-name-from-outer-scope-pylint
+@pytest.fixture(name="employee_obj")
+def fixture_employee_obj():   ## <-- when same name is used later, this is invoked
+    """
+    Test Employee Fixture
+    """
+    obj = Employee(first='Corey', last='Schafer', pay=50000)
+    return obj
+
+def test_employee_init(employee_obj):
+    employee_obj.first = 'Corey'
+    employee_obj.last = 'Schafer'
+    employee_obj.pay = 50000
+
+def test_email(employee_obj):
+    assert employee_obj.email == 'Corey.Schafer@email.com'
+
+def test_fullname(employee_obj):
+    assert employee_obj.fullname == 'Corey Schafer'
+
+```
+for linting, see this:
+https://stackoverflow.com/a/57015304/25560091
+
+* mock
+
+```python
+
+
+
+```
+
+
 
