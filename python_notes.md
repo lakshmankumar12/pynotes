@@ -1058,6 +1058,9 @@ pip install package --log LOGFILE
 pip3 download --no-deps --no-build-isolation <package>
 ## and install from package
 pip3 install path/to/downloaded/tar/or/whl/file
+
+## with the break / broken
+--break-system-packages
 ```
 
 ## Python Interpreter notes
@@ -1177,6 +1180,7 @@ import traceback
         e.whatever..
         e.errno
         e.strerror
+        t = type(e).__name__
         var = traceback.format_exc()
 
 ```
@@ -1434,6 +1438,8 @@ docker run --rm -it -v $PWD:/host python:2.7.18-slim-stretch python '-c' 'import
 
 # jinja templates
 
+* https://realpython.com/primer-on-jinja-templating/
+
 ```python
 
 #test for length of list or dict
@@ -1458,6 +1464,28 @@ docker run --rm -it -v $PWD:/host python:2.7.18-slim-stretch python '-c' 'import
 '''
     "cell_id": {{ eb.cellid if 'cellid' in eb else 1 }},
 '''
+# string check
+'''
+{% if 'abc' == value %}
+{% elif 'efg' == value %}
+{% endif %}
+'''
+# if .. elif
+
+## sample
+from jinja2 import Environment, FileSystemLoader
+## will look for PWD/templates/helloWorld.jinja
+env = Environment(loader = FileSystemLoader('templates'))
+template = env.get_template('helloWorld.jinja')
+output = template.render(value1, value2)
+print(output)
+
+## from a string
+template  = Environment().from_string('''template string - {{variable}}''')
+
+
+
+
 
 
 ```
@@ -1609,6 +1637,7 @@ os.rename(src,dst)   # mv in python
 
 os.unlink(dst)  # rm a file , delete
 os.remove(dst)  # unlink/remove are the same
+os.chmod(path, 0o755)
 
 shutil.rmtree(dir_with_contents)  # just delete a dir / folder with contents
 shutil.copyfile(src,dst)          # file copy / cp
@@ -2316,8 +2345,15 @@ json.load(fd)
 import yaml
 
 # from file
-with open(yaml_file, 'r') as fd:
-    obj = yaml.load(fd)
+try:
+    with open(yaml_file, 'r') as fd:
+        obj = yaml.safe_load(fd)
+except yaml.parser.ParserError as e:
+    print (f'unable to read file: {yaml_file}\n'
+           'error:'
+           f'{e}')
+except FileNotFoundError as e:
+
 # from string
 obj = json.safe_load(str_var)
 pyobj = yaml.load(fd)
