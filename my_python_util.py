@@ -1,3 +1,7 @@
+import pexpect
+import os
+import struct, fcntl, termios, signal, sys
+
 def general_expect(child, expect_list, intent_desc, eof_ok=0, print_output=0, timeout=0, timeout_ok=0):
   ''' Wrapper on top of pexpect's child.expect([expect-list])
 
@@ -30,22 +34,20 @@ def general_expect(child, expect_list, intent_desc, eof_ok=0, print_output=0, ti
     else:
       error="Timeout out without matches:\n"
   if print_output:
-    print child.before+child.after
+    print (str(child.before)+str(child.after))
   if error:
     err_str = "Error while doing:" + intent_desc + "\n" + "Error:" + error + "\n"
-    if isinstance(expect_list, basestring):
+    if isinstance(expect_list, str):
       expected=expect_list
     else:
       expected = ""
       for i in expect_list:
         expected += i + "\n"
     err_str += "Expected:\n" + expected + "\n"
-    open("general_expect_failure","w").write(err_str+child.before)
+    open("general_expect_failure","w").write(err_str+str(child.before))
     raise Exception(err_str);
   return result
 
-import struct, fcntl, termios, signal, sys
-from general_expect import general_expect as expect_child
 
 def get_parent_win_size():
     with open(os.ctermid(), 'r') as fd:
@@ -88,4 +90,3 @@ def execute_cmd(cmd, print_cmd=False, error_ok=True, shouldErrBeEmpty=True, prin
     if print_op:
         print("Got:\n%s"%output)
     return (errcode, output, err)
-
