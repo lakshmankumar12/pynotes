@@ -1499,7 +1499,7 @@ template  = Environment().from_string('''template string - {{variable}}''')
 ```python
 import argparse
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description='About my program')
 parser.add_argument("-v","--verbose", help="increase output verbosity", action="store_true")       # captures if --verbosity present or not in arg-list. No arg per-se for this option.
 parser.add_argument("-v","--verbose", help="increase output verbosity", action="count")            # captures how many times --verbosity was present in arg-list. No arg per-se for this option.
 parser.add_argument("-v","--verbose", help="increase output verbosity", type=int)                  # --verbosity <int>
@@ -1518,7 +1518,7 @@ if cmd_options.verbose:
 
 # COPY THIS for fresh scripts!!
 def parse_args():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='About my program')
     parser.add_argument("file", help="input file")
     cmd_options = parser.parse_args()
     return cmd_options
@@ -1530,6 +1530,20 @@ group.add_argument("-q", "--quiet", action="store_true")
 
 #to explicitly print help
 parser.print_help()
+
+# subparsers
+subparsers = parser.add_subparsers(title='subcommands', required=True)
+parser_start = subparsers.add_parser( 'start_services', help='Start all magma services',)
+## parser_start is like the original
+
+## one hack to quickly branch off
+parser_start.set_defaults(func=start_services)
+
+# Execute the subcommand function
+## args, arg1, arg2 are passed as is to the start_services()
+args.func(args, arg1, arg2)
+
+
 ```
 
 ### argc/argv example
@@ -1599,6 +1613,16 @@ use r'...' to represet a regex for python to preserve the back-slashes
 \s   - space
 \S   - non-space
 ()   - imply group. Use \( if u want to match a literal (
+
+```python
+
+### named re expression group
+match = re.search('(?P<name>.*) (?P<phone>.*)', 'John 123456')
+match.group('name')
+## 'John'
+
+```
+
 
 
 ## os-package (file manipulation stuff)
@@ -1801,7 +1825,7 @@ datetime_object.date()
 
 #to get time in seconds since epoch or from a datetime
 now = int(time.time())
-now = datetime.datetime.now().timestamp()
+now = int(datetime.datetime.now().timestamp())
 
 ## guess from any date string
 import dateutil.parser
@@ -1872,6 +1896,35 @@ Color(1)
 Color['Red']
 ```
 
+## hashlib
+
+```python
+import base64
+a='somestr'
+bytesvalue = base64.b64encode(a.encode('utf-8'))
+clearstrasbyes = base64.b64decode(bytesvalue)
+orig_str = clearstrasbyes.decode('utf-8')
+
+import hashlib
+m = hashlib.md5()
+m.update(what_you_want_to_hash_as_bytes)
+m.hexdigest()         ## gives as str:  cce0d35b8b2c4dafcbde3deb983fec0a
+
+# in one go
+hashlib.md5('instr'.encode('utf-8')).hexdigest()
+
+## If you want a colon im between hex chars
+'-'.join(digest[i:i+2] for i in range(0, len(digest), 2))
+
+# other hashes - sha1, sha256
+hashlib.sha256()
+# get algo by name
+name = 'md5' if standard else 'sha256'
+m = hashlib.new(name)
+
+```
+
+
 
 ## urllib
 
@@ -1897,11 +1950,24 @@ result = urllib2.urlopen(request)
 url='https://api.github.com/user'
 user='username'
 pass='password'
-r = requests.get(url, auth=(user, pass))
+rsp = requests.get(url, auth=(user, pass))
+
+#useful respsonse members
+
+# ineger status code eg: 200
+rsp.status_code
+# if you know rsp is a json
+#  just get it as a py dict
+rsp.json()
+# as text(str)
+tsp.text
 
 dictvar = requests.utils.dict_from_cookiejar(cookiejar)
 cookies = requests.utils.cookiejar_from_dict(dictvar)
+
 ```
+
+* python equivalent of curl --resolve : https://stackoverflow.com/a/22614367/25560091
 
 ### Post a json object
 
@@ -2514,9 +2580,14 @@ tqdm.setdescription("some string")
 ```sh
 mkdir path/to/a/parent_folder/hosting/virtual/envs
 cd path/to/a/parent_folder/hosting/virtual/envs
-virtualenv name_of_env
-#upon that you will see a new folder name_of_env here
 
+#in py2
+virtualenv name_of_env
+
+#py3
+python3 -m venv name_of_env
+
+#upon that you will see a new folder name_of_env here
 cd name_of_env/bin/
 
 # you can use this to step in
@@ -2525,9 +2596,11 @@ source activate
 # in this bash, you can pip install anything
 # or run python here
 
-(or you can direclyt invoke the python from here to run)
-
+# or you can directly invoke the python from here to run
 path/to/a/parent_folder/hosting/virtual/envs/name_of_env/bin/python <your script>
+
+#to quit that virtual-env
+deactivate
 ```
 
 
