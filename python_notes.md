@@ -812,6 +812,9 @@ a_closure = create_a_closure("intial_value_for_state1")
 
     #users later call just, but fancy works happen!
     a = function_that_will_be_wrapped(..)
+
+    ## you can also use args,**kwargs on the decorator_name, and func on the wrapped-def:
+    ## see https://stackoverflow.com/a/279586/25560091
     ```
 * Users just invoke normally with function_that_will_be_wrapped() and that gets wrapped by the decorator
 
@@ -1790,6 +1793,7 @@ https://stackabuse.com/how-to-format-dates-in-python/
 
 datetime.date.today()
 datetime.datetime.now()    # same as today, but can accept a tz as optional name arg
+datetime.datetime.utcnow()    # get utc time
 
 datetime.datetime.strptime('time-in-string','format')   # read a time in a string in.
 datetime.datetime.strftime('format')                    # print a time in a string
@@ -1960,11 +1964,19 @@ rsp.status_code
 #  just get it as a py dict
 rsp.json()
 # as text(str)
-tsp.text
+rsp.text
+# request from rsp
+response.request.url
 
 dictvar = requests.utils.dict_from_cookiejar(cookiejar)
 cookies = requests.utils.cookiejar_from_dict(dictvar)
 
+# Raise an exception for HTTP errors
+try:
+    rsp = requests.get(url,...)
+    rsp.raise_for_status()
+except requests.exceptions.RequestException as e:
+    print(f"Request failed: {e}")
 ```
 
 * python equivalent of curl --resolve : https://stackoverflow.com/a/22614367/25560091
@@ -2033,6 +2045,13 @@ for row in rows:
 
 #pretty
 soup.prettify()
+
+```
+
+```sh
+## extract text from a.html to a.txt
+python -c 'import bs4;fd=open("a.html"); soup = bs4.BeautifulSoup(fd, "html.parser");print(soup.get_text());' > a.txt
+
 ```
 
 4 types of objects
