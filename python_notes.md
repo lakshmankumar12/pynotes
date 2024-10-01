@@ -1188,6 +1188,17 @@ import traceback
 
 ```
 
+* handle mutiple errors in one except
+
+```python
+
+try:
+    whatever()
+except (ValueError, IOError) as e:
+    print(f"Got error: {type(e).__name__}")
+```
+
+
 * Typical Types of Error
 
 
@@ -1456,6 +1467,13 @@ docker run --rm -it -v $PWD:/host python:2.7.18-slim-stretch python '-c' 'import
   ],
   {% endif %}
 '''
+#for loop on dict
+'''
+   {% for key, value in dict_item.items() %}
+      <h1>Key: {{key}}</h1>
+      <h2>Value: {{value}}</h2>
+   {% endfor %}
+'''
 
 #member in dict
 '''
@@ -1474,6 +1492,15 @@ docker run --rm -it -v $PWD:/host python:2.7.18-slim-stretch python '-c' 'import
 {% endif %}
 '''
 # if .. elif
+
+## none check
+'''
+{% if p is not none %}
+    {{ p.User['first_name'] }}
+{% else %}
+    NONE
+{% endif %}
+'''
 
 ## sample
 from jinja2 import Environment, FileSystemLoader
@@ -2112,11 +2139,51 @@ for i in all_a:
 lxml.etree.tostring(element)
 
 ```
-* Another library?
+
+### minidom library
 
 ```python
 import xml.dom.minidom
-xml.dom.minidom.parseString(lxml.etree.tostring(mytree)).toprettyxml()
+
+## parse a string to a xml.dom.minidom.Document object
+dom = xml.dom.minidom.parseString(lxml.etree.tostring(mytree)).toprettyxml()
+
+## get the stringback
+dom.toxml()
+
+## there are (atleast) 3 types of objects
+####  document/dom --> the whole xml document
+####  element node
+####  text node
+##
+### a simple <a>text</a> is one element with one childnode (which is just a text node)
+### a <a>text<b>inner</b>more outer</a> is a element with 3 children - textnode, element, textnode
+
+
+## returns an array of elements with the given tag (works on both the whole dom and individual elements)
+child_elements = dom.getElementsByTagName(tagname)
+
+## get attribute of a element
+value = element.getAttribute(attribute)
+
+## get value of a element
+value = element.firstChild.nodeValue
+
+## replace value
+value = element.firstChild.replaceWholeText(newvalue)
+
+## remove
+results = parentelement.getElementsByTagName(tagname)
+parentelement.removeChild(results[0])
+
+## create element
+newelem = topleveldoc.createElement('tag')
+newelem.setAttribute('attribname','attribvalue')
+newelemTextValue = topleveldoc.createTextNode('textvalue')
+newelem.appendChild(newelemTextValue)
+parentElem.appendChild(newelem)
+
+
 ```
 
 ## Selenium
@@ -2169,6 +2236,11 @@ python -m SimpleHTTPServer 8080
 #python3
 python3 -m http.server 8080
 ```
+
+### simple https-server
+
+* refer `python3 ~/github/quick-utility-scripts/simple_https_server.py`
+
 
 ### SSL stuff
 
@@ -2695,7 +2767,7 @@ General purpose event scheduler
 ```python
 import sched, time
 s = sched.scheduler(time.time, time.sleep)
-def do_something(sc): 
+def do_something(sc):
     print "Doing stuff..."
     # do your stuff
     s.enter(60, 1, do_something, (sc,))
@@ -2827,7 +2899,7 @@ https://developers.google.com/protocol-buffers/docs/reference/python-generated?c
 
 try:
     # Make a gRPC call that may result in a timeout
-    response = tgt_client.MessageType(request, timeout=10) 
+    response = tgt_client.MessageType(request, timeout=10)
 except grpc.RpcError as e:
     if isinstance(e, grpc.FutureTimeoutError):
         # Handle timeout error
@@ -2888,6 +2960,9 @@ outer.inner.CopyFrom(another_inner)
 
 ## add to a list
 outer.append()
+
+## simple scalers will give true on hasattr(obj, 'simple_scalar_field')
+## struct members will give false on hasattr(obj, 'another_message_member')
 
 ```
 
