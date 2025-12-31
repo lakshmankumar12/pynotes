@@ -866,12 +866,12 @@ from types import SimpleNamespace
 
 t = SimpleNamespace(member1='value1',member2='value2')
 
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 ## leverages typing
 @dataclass
 class Student:
-    name: str
+    name: str = "default_value"
     age: int
     rating: float
 
@@ -881,14 +881,77 @@ class FsmState:
     run: Callable
     next_state: Dict[str, str]
 
+student_dict = asdict(astudentobject)
+
 ```
+
+## fmt_string
+
+```python
+# Replace type specifiers, handling optional alignment/sign characters
+header_fmt_h = re.sub(r'([-<>]?\d+)[df]', r'\1s', fmt_string)
+
+from dataclasses import dataclass, field, fields
+import re
+
+@dataclass
+class AGWLine:
+    num: int = field(default="", metadata={'fmt': '3d', 'name': 'Num'})
+    tid: str = field(default="", metadata={'fmt': '20s', 'name': 'TID'})
+    nid: str = field(default="", metadata={'fmt': '20s', 'name': 'NID'})
+    nname: str = field(default="", metadata={'fmt': '20s', 'name': 'Node Name'})
+    ndesc: str = field(default="", metadata={'fmt': '30s', 'name': 'Node Description'})
+    gname: str = field(default="", metadata={'fmt': '30s', 'name': 'Gateway Name'})
+    gid: str = field(default="", metadata={'fmt': '30s', 'name': 'Gateway ID'})
+    gdesc: str = field(default="", metadata={'fmt': '30s', 'name': 'Gateway Description'})
+    online: str = field(default="", metadata={'fmt': '3s', 'name': 'On'})
+    time: str = field(default="", metadata={'fmt': '14s', 'name': 'Time'})
+    version: str = field(default="", metadata={'fmt': '30s', 'name': 'Version'})
+    gkey: str = field(default="", metadata={'fmt': '40s', 'name': 'Gateway Key'})
+
+
+class Formatter:
+
+    @staticmethod
+    def get_fmt_string(cls):
+        """Build format string from dataclass metadata"""
+        parts = [f"{{{f.name}:{f.metadata['fmt']}}}" for f in fields(cls)]
+        return " | ".join(parts)
+
+    @staticmethod
+    def get_header_fmt_string(cls):
+        """Build header format string (convert d/f to s)"""
+        fmt_str = Formatter.get_fmt_string(cls)
+        return re.sub(r'([-<>]?\d+)[df]', r'\1s', fmt_str)
+
+    @staticmethod
+    def get_header_dict(cls):
+        """Build dictionary for header values"""
+        return {f.name: f.metadata['name'] for f in fields(cls)}
+
+    @staticmethod
+    def print_header(cls):
+        """Print the header line"""
+        print(Formatter.get_header_fmt_string(cls).format(**Formatter.get_header_dict(cls)))
+
+    @staticmethod
+    def print_line(obj):
+        """Print this instance as a formatted line"""
+        data_dict = {f.name: getattr(obj, f.name) for f in fields(obj)}
+        print(Formatter.get_fmt_string(type(obj)).format(**data_dict))
+
+Formatter.print_header(AGWLine) ## with class
+Formatter.print_line(agwline)   ## with object
+
+```
+
 
 
 ## asyncio
 
 ### common asyncio statements
 
-```py
+```python
 await asyncio.sleep(1)
 
 loop.call_soon_threadsafe(non_async_function, arg1, arg2, argN)
@@ -896,11 +959,43 @@ loop.create_task(async_function(arg1, arg2, argN))  #note the way args are passe
 
 loop.call_at(loop.time()+1, async_func, arg1, arg2)
 
+## this is a arg less function, that holds the loop
+## will return if you call loop.stop()
 loop.run_forever()
 
 loop = asyncio.new_event_loop()
 
 ```
+
+* Typical call in a second thread
+
+```python
+
+
+class MyThreadedAsyncClass:
+    async def run_all(self):
+        await asyncio.gather(
+            self.async_func_1(),
+            self.async_func_2()
+        )
+
+    def start(self):
+        def runner():
+            self._loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(self.loop)
+            self.loop.run_until_complete(self.run_all())
+
+        self.thread = threading.Thread(target=runner, daemon=False)
+        self.thread.start()
+
+    def stop(self):
+        self.loop_control_variable = False
+        if self.thread:
+            self.thread.join()
+
+
+```
+
 
 
 ## subprocess
@@ -930,7 +1025,7 @@ asyncio.run(run('ls /zzz'))
 
 ## regular subprocess
 #### Most quick and useful
-completedProcess=subprocess.run("ls -l /var/log", shell=True, capture_output=True)
+completedProcess=subprocess.run("ls -l /var/log", shell=True, capture_output=True, text=True)
 print ("stdout was:%s"%completedProcess.stdout)
 print ("stderr was:%s"%completedProcess.stderr)
 print ("exit code was:%s"%completedProcess.returncode)
@@ -1174,6 +1269,17 @@ def your_fn():
         resp = None
     finally:
         #always gets executed
+
+def your_fn():
+    ...
+    try:
+        whatever()
+
+    #copy paste from here:
+    except Exception:
+        ## the current exception is automatically picked by logging.exception
+        logging.exception("my message and other  args:%s", arg1)
+        resp = None
 
 
 #printing stack-trace at exception
@@ -1442,6 +1548,19 @@ def handler(signum, frame):
 signal.signal(signal.SIGALRM, handler)
 ```
 
+## tabular printing
+
+```python
+indict = type_sorted_nw_ents
+interest_keys = ['type', 'key', 'name']
+filtered = (lambda ld, lk: [{k: d[k] for k in d if k in lk} for d in ld])(
+                indict, interest_keys)
+
+import pandas as pd
+print(pd.DataFrame(filtered))
+```
+
+
 # run python 2.7
 
 ```sh
@@ -1547,8 +1666,10 @@ if cmd_options.verbose:
 # dash- is converted to underscore
 
 # COPY THIS for fresh scripts!!
+import argparse
 def parse_args():
     parser = argparse.ArgumentParser(description='About my program')
+    parser.add_argument("-l","--long-arg", help="regular string arg")
     parser.add_argument("file", help="input file")
     cmd_options = parser.parse_args()
     return cmd_options
@@ -1562,16 +1683,21 @@ group.add_argument("-q", "--quiet", action="store_true")
 parser.print_help()
 
 # subparsers
-subparsers = parser.add_subparsers(title='subcommands', required=True)
+subparsers = parser.add_subparsers(title='subcommands', dest="cmd")
 parser_start = subparsers.add_parser( 'start_services', help='Start all magma services',)
 ## parser_start is like the original
 
 ## one hack to quickly branch off
 parser_start.set_defaults(func=start_services)
 
-# Execute the subcommand function
-## args, arg1, arg2 are passed as is to the start_services()
-args.func(args, arg1, arg2)
+## verify if cmd was provided
+if not args.cmd:
+    parser.print_usage()
+
+# Execute the subcommand function, by calling func on the args returned by top_parser.parse_args()
+## one hack is to pass the args again to the start_services()
+## all args are passed as-is to the func
+args.func(args, my_customarg1, my_customarg2)
 
 
 ```
@@ -1668,6 +1794,7 @@ os.makedirs(path)   # it will create all dirs in path if needed.
                     # But the last dir MUST be non-existant.
                     # You can either check isdir() before, or catch FileExistsError
 os.getcwd()         # get cwd pwd
+os.getpid()         # get self pid
 os.chdir(path)      # cd to a working-dir
 os.path.dirname(os.path.realpath(__file__))   # get dir of current file
 
@@ -1841,8 +1968,8 @@ datetime.isoformat() # gives: 2022-03-16T04:51:27+00:00
 %s - get seconds since epoch #Undocumented. Might work or not.
 
 ## initialize from epoch
-datetime.datetime.fromtimestamp(123132112)
-datetime.datetime.fromtimestamp(0)           # initialize from 0-epoch.
+datetime.datetime.utcfromtimestamp(123132112)
+datetime.datetime.utcfromtimestamp(0)           # initialize from 0-epoch.
 
 datetime.timedelta is returned when you subtract 2 datetime.datetime objects
 
@@ -1973,6 +2100,16 @@ request = urllib2.Request("http://api.foursquare.com/v1/user")
 base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
 request.add_header("Authorization", "Basic %s" % base64string)
 result = urllib2.urlopen(request)
+
+```
+
+```sh
+## quickly urlify a strng
+echo "hello world\!" | python3 -c "import urllib.parse; print(urllib.parse.quote(input()))"
+
+## un-urlify
+echo "hello%20world%21" | python3 -c "import urllib.parse; print(urllib.parse.unquote(input()))"
+
 ```
 
 ## requests
@@ -2186,7 +2323,8 @@ parentElem.appendChild(newelem)
 
 ```
 
-## Selenium
+## selenium
+
 
 * Download chrome driver from google - https://sites.google.com/a/chromium.org/chromedriver/home
 * pip install selenium lxml csselect
@@ -2270,6 +2408,17 @@ context.verify_mode = ssl.CERT_REQUIRED
 context.load_verify_locations(cafile=cafiles)
 httpd.socket = context.wrap_socket (httpd.socket, server_side=True)
 httpd.serve_forever()
+
+```
+
+## threading
+
+```
+# get thread id
+
+import threading
+
+threading.get_ident()
 
 ```
 
@@ -2375,9 +2524,14 @@ log_handler.setFormatter(formatter)
 log_handler.rotator = gzip_rotator
 log_handler.namer = gzip_namer
 logger = logging.getLogger()
+logger.handlers.clear()
 logger.addHandler(log_handler)
 logger.setLevel(level)
+logger.propagate = False
 
+
+##disable root logger
+logging.getLogger().disabled = True
 
 
 ```
@@ -2447,6 +2601,14 @@ with open("file_name.csv") as fd:
     for row in csv_lines:
         print("col-0:%d col-1:%s"%(row[0],row[1]))
 
+
+## count some row:
+my_csv="path/to/file.csv"
+import csv
+from collections import Counter
+count = Counter(row[3] for row in csv.reader(open(my_csv)))
+print('\n'.join(f"{k:30s}: {v}" for k, v in count.most_common()))
+
 ```
 
 For writing
@@ -2455,6 +2617,34 @@ For writing
 c = csv.writer(filehandle_from_open)
 c = csv.writer(f, quoting=csv.QUOTE_ALL)
 ```
+
+* dict reader/writer
+
+```python
+import csv
+
+with open('data.csv', 'r') as f:
+    ## Dict reader assumes first line is always a heading
+    reader = csv.DictReader(f)
+    ## if you dont have a heading row
+    reader = DictReader(f, fieldnames=['col1', 'col2'])
+
+    for row in reader:
+        # Each row is a dictionary with column headers as keys
+        print(row['name'], row['email'], row['age'])
+
+
+with open('output.csv', 'w', newline='') as f:
+    fieldnames = ['name', 'age', 'city']
+    ## note the fieldnames is a list that controls the order of the columns
+    writer = csv.DictWriter(f, fieldnames=fieldnames)
+
+    writer.writeheader()  # Write column headers
+    writer.writerows(data)  # Write all rows
+    # or: writer.writerow(data[0])  # Write one row
+
+```
+
 
 ## excel to csv
 
@@ -2521,6 +2711,24 @@ pyobj = yaml.load(fd)
 #    True   :  dicts,lists are maintained on same line with [],{}
 str_var = yaml.dump(data, default_flow_style=False)
 ```
+
+## ast
+
+
+* Load a python print() printed data back as a py-object
+
+search: literal load print
+
+```
+import ast
+from pprint import pprint
+file='/tmp/a.txt'
+a = ast.literal_eval(open(file).read())
+
+pprint(a)
+
+```
+
 
 
 ## sha1
@@ -2676,13 +2884,12 @@ cd path/to/a/parent_folder/hosting/virtual/envs
 virtualenv name_of_env
 
 #py3
-python3 -m venv name_of_env
+envname=...
+python3 -m venv ${envname}
 
-#upon that you will see a new folder name_of_env here
-cd name_of_env/bin/
-
-# you can use this to step in
-source activate
+#upon that you will see a new folder ${envname} in pwd
+#you can use this to step in
+source ${envname}/bin/activate
 
 # in this bash, you can pip install anything
 # or run python here
@@ -2926,6 +3133,13 @@ feature_future.add_done_callback(process_response)
 https://stackoverflow.com/questions/55202617/how-to-make-async-grpc-calls-in-python
 
 ## protobuf
+
+* building .proto file
+
+```
+python3 -m  grpc_tools.protoc  --proto_path=.  --python_out=.  --grpc_python_out=.  ./data_collector.proto
+```
+
 
 ```python
 
