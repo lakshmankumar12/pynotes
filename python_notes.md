@@ -1104,6 +1104,65 @@ https://docs.python.org/3/library/struct.html
 # P: void*
 ```
 
+# pydantic
+
+* type-hints
+
+```python
+
+def function_name(arg1: int, arg2: str) -> str:
+    print("body of function")
+
+from typing import Optional
+
+def function_name(code: str)-> Optional[str]: # str or None
+    return None
+
+## list            ## any list
+## list[str]       ## list of str
+## dict            ## any dict
+## dict[str, int]  ## dict of key-str type and int value type
+
+my_var:str = "string value"
+
+```
+
+* pydantic
+
+```python
+
+from pydantic import BaseModel, Field
+
+class Payment(BaseModel):
+    order_id: str
+    amount: int
+    currency: str = "INR"
+
+
+## all fields are constructed automatically with their invidical type-conversions
+p1 = Payment(order_id="ord101", amount=2500)
+p2 = Payment(order_id="ord101", amount="2500") ## okay int("2500") works
+p3 = Payment(order_id="ord101", amount="two") ## raises pydantic.ValidationError
+
+class Payment(BaseModel):
+    order_id: str = Filed(min_length=3)
+    amount: int   = Field(gt=0, le=500000, default=100)
+    email: str    = Field(pattern=r'.+@.+')
+
+
+PydanticModeClassName.model_validate(any_py_dict) ## raises pydantic.ValidationError when fails
+PydanticModeClassName.model_validate_json(some_json_str) ## raises pydantic.ValidationError when fails
+pydantic_model_object.model_dump_json()   ## returns a json-str
+
+## validating ValidationError
+try:
+    PydanticModeClassName.model_validate(any_py_dict) ## raises pydantic.ValidationError when fails
+except ValidationError as e:
+    for one_error in e.errors:
+        print(one_error['loc'] ,"|", one_error['msg'])
+
+
+```
 
 
 
@@ -2141,6 +2200,10 @@ try:
     rsp.raise_for_status()
 except requests.exceptions.RequestException as e:
     print(f"Request failed: {e}")
+
+
+requests.get(url, headers=headers, params=params, timeout=10)
+requests.post(url, headers=headers, json=json_str, timeout=10)
 ```
 
 * python equivalent of curl --resolve : https://stackoverflow.com/a/22614367/25560091
@@ -2623,6 +2686,8 @@ c = csv.writer(f, quoting=csv.QUOTE_ALL)
 ```python
 import csv
 
+### IMPORTANT -- reading -- all values are strings. You have to int() or float() them appropriately!
+
 with open('data.csv', 'r') as f:
     ## Dict reader assumes first line is always a heading
     reader = csv.DictReader(f)
@@ -2642,6 +2707,18 @@ with open('output.csv', 'w', newline='') as f:
     writer.writeheader()  # Write column headers
     writer.writerows(data)  # Write all rows
     # or: writer.writerow(data[0])  # Write one row
+
+
+#with a list
+with open("out.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(headers)
+    writer.writerows(rows)
+
+with open("out.csv", newline="") as f:
+    reader = csv.reader(f)
+    header = next(reader)        # consume header(optional)
+    rows = list(reader)
 
 ```
 
@@ -3177,6 +3254,24 @@ outer.append()
 
 ## simple scalers will give true on hasattr(obj, 'simple_scalar_field')
 ## struct members will give false on hasattr(obj, 'another_message_member')
+
+# Convert to human-readable text format
+text_format = str(proto_message)
+# or
+from google.protobuf import text_format
+text_format_str = text_format.MessageToString(proto_message)
+
+from google.protobuf import json_format
+
+# Convert to JSON string (most readable)
+json_str = json_format.MessageToJson(proto_message)
+
+# With formatting options
+json_str = json_format.MessageToJson(
+    proto_message,
+    preserving_proto_field_name=True,  # Use proto field names instead of camelCase
+    indent=2  # Pretty print
+)
 
 ```
 
