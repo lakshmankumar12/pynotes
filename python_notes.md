@@ -1150,9 +1150,9 @@ class Payment(BaseModel):
     email: str    = Field(pattern=r'.+@.+')
 
 
-PydanticModeClassName.model_validate(any_py_dict) ## raises pydantic.ValidationError when fails
-PydanticModeClassName.model_validate_json(some_json_str) ## raises pydantic.ValidationError when fails
-pydantic_model_object.model_dump_json()   ## returns a json-str
+model_object = PydanticModeClassName.model_validate(any_py_dict) ## raises pydantic.ValidationError when fails
+model_object = PydanticModeClassName.model_validate_json(some_json_str) ## raises pydantic.ValidationError when fails
+json_str = pydantic_model_object.model_dump_json()   ## returns a json-str
 
 ## validating ValidationError
 try:

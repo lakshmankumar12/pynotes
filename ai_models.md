@@ -34,6 +34,7 @@ client = OpenAI(api_key=api_key)                     # reads OPENAI_API_KEY auto
 
 response = client.chat.completions.create(
     model="gpt-6-astra",
+    response_format={"type":"json_object"},  ## forces valid JSON
     messages=[
         {"role": "system", "content": "You are MakeMyTrip's friendly travel assistant. Answer in 2 short lines."},
         {"role": "user", "content": "I'm going to Goa this weekend. What should I pack?"},
@@ -41,4 +42,16 @@ response = client.chat.completions.create(
 )
 
 print(response.choices[0].message.content)
+```
+
+* groq.com
+
+url: https://console.groq.com/keys
+
+```python
+client = OpenAI(api_key=groq_api_key, baseurl="https://api.groq.com/openai/v1")
+model = "openai/gpt-oss-20b"
+
+
+
 ```
